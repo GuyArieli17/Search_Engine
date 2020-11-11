@@ -1,10 +1,10 @@
+import re
+
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from document import Document
 
-
 class Parse:
-
     def __init__(self):
         self.stop_words = stopwords.words('english')
 
@@ -15,8 +15,32 @@ class Parse:
         :return:
         """
         text_tokens = word_tokenize(text)
+        text_tokens_with_hashtag=[]
+        i = 0
+        while i != len(text_tokens):
+            if text_tokens[i]=='#':
+
+                listHashTags=re.findall('[A-Z][^A-Z]*',text_tokens[i+1])
+                for w in listHashTags:
+                    text_tokens_with_hashtag.append(w.lower())
+                text_tokens_with_hashtag.append(text_tokens[i]+text_tokens[i+1].lower())
+                i+=2
+            else:
+                text_tokens_with_hashtag.append(text_tokens[i])
+                i+=1
+
         text_tokens_without_stopwords = [w.lower() for w in text_tokens if w not in self.stop_words]
-        return text_tokens_without_stopwords
+        text_tokens_with_tags = []
+        i=0
+        while i!=len(text_tokens_without_stopwords):
+            if text_tokens_without_stopwords[i]=='@':
+                text_tokens_with_tags.append(text_tokens_without_stopwords[i]+text_tokens_without_stopwords[i+1])
+                i+=2
+            else:
+                text_tokens_with_tags.append(text_tokens_without_stopwords[i])
+                i+=1
+
+        return text_tokens_with_tags
 
     def parse_doc(self, doc_as_list):
         """
@@ -46,3 +70,5 @@ class Parse:
         document = Document(tweet_id, tweet_date, full_text, url, retweet_text, retweet_url, quote_text,
                             quote_url, term_dict, doc_length)
         return document
+
+
