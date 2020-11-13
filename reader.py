@@ -1,7 +1,6 @@
 import os
 import pandas as pd
 
-
 class ReadFile:
     def __init__(self, corpus_path):
         self.corpus_path = corpus_path
