@@ -1,5 +1,3 @@
-import re
-
 import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
@@ -27,9 +25,11 @@ class Parse:
             else:
                 text_tokens_with_tags.append(text_tokens_without_stopwords[i])
                 i+=1
-        for i in text_tokens_without_stopwords:
+        """for i in text_tokens_with_tags:
+            if i[]
             self.convertURL(i)
-            self.convertNumber()
+            if i.isdigit():
+                self.convertNumber(i,i+1)"""
         return text_tokens_with_tags
 
     def parse_doc(self, doc_as_list):
@@ -166,7 +166,3 @@ class Parse:
             return num+'B'
         if str.lower()=="percent" or str.lower()=="percentage":
             return num+"%"
-
-if __name__ == '__main__':
-    p=Parse()
-    print(p.stop_words)
