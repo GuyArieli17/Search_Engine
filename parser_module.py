@@ -6,6 +6,102 @@ from document import Document
 class Parse:
     def __init__(self):
         self.stop_words = stopwords.words('english')
+        self.stop_words_dic = {w for w in self.stop_words}
+
+    def bind_tokens_by_caps(self, list_tokens):
+        return_list = []
+        prev_string = ""
+        for token in list_tokens:
+            if token[0].isupper():
+                if prev_string == "":
+                    prev_string = token
+                else:
+                    prev_string += ' ' + token
+            else:
+                if prev_string != '':
+                    return_list.append(prev_string)
+                return_list.append(token)
+                prev_string = ''
+        if prev_string != '':
+            return_list.append(prev_string)
+        return return_list
+
+    def expend_not_shortcut(self, word):
+        return_value = word
+        index__find = word.find("'")
+        if index__find == -1:
+            return return_value
+        index__find = word.find("'t")
+        if index__find != -1:
+            if index__find > 0 and word[index__find - 1] == 'n':
+                index__find = index__find - 1
+            return_value = word[0:index__find] + ' not'
+        else:
+            index__find = word.find("'m")
+            if index__find != -1:
+                return_value = word[0:index__find] + 'am'
+            else:
+                index__find = word.find("'re")
+                if index__find != -1:
+                    return_value = word[0:index__find] + 'are'
+                elif word.lower() == "he's" or word.lower() == "she's":
+                    return_value = word[0:2] + ' is'
+        return return_value
+
+    def convert_text_line_to_tokens(self, line):
+        return nltk.word_tokenize(line)
+
+    def convert_text_to_lines(self, text):
+        return nltk.sent_tokenize(text)
+
+    def find_sub_text_indexes(self, hashtag):
+        word = ''
+        return_list = []
+        for letter in hashtag:
+            if letter.isupper():
+                if not word.isupper() and len(word) > 0:
+                    return_list.append(word)
+                    word = ''
+            elif word.isupper() and len(word) != 1:
+                return_list.append(word)
+                word = ''
+            word += letter
+        if word != '':
+            return_list.append(word)
+        return return_list
+
+    def set_Upper_or_lower(self, word_list):
+        # create dict for lower and upper list
+        lower_set = dict()
+        upper_dic = dict()
+        # run on th Word_list
+        for index in range(len(word_list)):
+            word = word_list[index]  # get the word in index
+            if not word[0].isupper():  # a lower word
+                lower_set[word.lower()] = 0  # add word to lower dic
+                if upper_dic.get(word.upper()) is not None:  # if appear in upper_dic
+                    indexes_list = upper_dic.get(word.upper())  # get list of indexes in list
+                    # run all over list and change to lower
+                    for upper_word_index in indexes_list:
+                        word_list[upper_word_index] = word.lower()
+                    indexes_list = []  # no need to update more
+            elif lower_set.get(word.lower()) is not None:  # Start with capital letter and in lower
+                word_list[index] = word.lower()
+            else:  # only seen as upper
+                list_value = upper_dic.get(word.upper())  # if list already exist
+                # update list if none
+                if list_value is None:
+                    list_value = []
+                list_value.append(index)  # add to list upper word
+                upper_dic[word.upper()] = list_value  # add the list to dic
+                word_list[index] = word.upper()  # change to upper word
+        return word_list
+
+
+
+    def correct_mistakes(self,word_list):
+        return word_list
+
 
     def parse_sentence(self, text):
         """
@@ -13,23 +109,30 @@ class Parse:
         :param text:
         :return:
         """
-        text_tokens = word_tokenize(text)
-        i = 0
-        text_tokens_without_stopwords = [w.lower() for w in text_tokens if w not in self.stop_words]
+        input = word_tokenize(text)
+        text_tokens = input
+        # text_tokens_without_stopwords = [w.lower() for w in text_tokens if w not in self.stop_words]
+        text_tokens_without_stop_words = []
         text_tokens_with_tags = []
-        i=0
-        while i!=len(text_tokens_without_stopwords):
-            if text_tokens_without_stopwords[i]=='@':
-                text_tokens_with_tags.append(text_tokens_without_stopwords[i]+text_tokens_without_stopwords[i+1])
-                i+=2
-            else:
-                text_tokens_with_tags.append(text_tokens_without_stopwords[i])
-                i+=1
-        """for i in text_tokens_with_tags:
-            if i[]
-            self.convertURL(i)
-            if i.isdigit():
-                self.convertNumber(i,i+1)"""
+        ignore_next = False
+        for i in range(len(text_tokens)):
+            lower_w = text_tokens[i].lower()
+            if ignore_next:
+                ignore_next = False
+            elif lower_w == '@' and i < (len(text_tokens)-1):
+                text_tokens_with_tags.append(lower_w + text_tokens[i+1])
+                ignore_next = True
+            elif lower_w not in self.stop_words:
+                text_tokens_without_stop_words.append(lower_w)
+
+        # i = 0
+        # while i != len(text_tokens_without_stopwords):
+        #     if text_tokens_without_stopwords[i]=='@':
+        #         text_tokens_with_tags.append(text_tokens_without_stopwords[i]+text_tokens_without_stopwords[i+1])
+        #         i += 2
+        #     else:
+        #         text_tokens_with_tags.append(text_tokens_without_stopwords[i])
+        #         i += 1
         return text_tokens_with_tags
 
     def parse_doc(self, doc_as_list):
@@ -61,84 +164,84 @@ class Parse:
                             quote_url, term_dict, doc_length)
         return document
 
-    def bind_tokens_by_caps(self,list_tokens):
-        return_list = []
-        prev_string = ""
-        for token in list_tokens:
-            if token[0].isupper():
-                if prev_string == "":
-                    prev_string = token
-                else:
-                    prev_string += ' ' + token
-            else:
-                if prev_string != '':
-                    return_list.append(prev_string)
-                return_list.append(token)
-                prev_string = ''
-        if prev_string != '':
-            return_list.append(prev_string)
-        return return_list
-
-    def expend_not_shortcut(self,word):
-        return_value = word
-        index_find = word.find("'")
-        if index_find == -1:
-            return return_value
-        index__find = word.find("'t")
-        if index__find != -1:
-            if index_find > 0 and word[index_find-1] == 'n':
-                index_find = index_find - 1
-            return_value = word[0:index_find] + ' not'
-        return return_value
-
-    def convert_text_line_to_tokens(self,line):
-        return nltk.word_tokenize(line)
-
-    def convert_text_to_lines(self,text):
-        return nltk.sent_tokenize(text)
-
-    def find_sub_text_indexes(self,hashtag):
-        word = ''
-        return_list = []
-        for letter in hashtag:
-            if letter.isupper():
-                if not word.isupper() and len(word) >0 :
-                    return_list.append(word)
-                    word = ''
-            elif word.isupper() and len(word) != 1:
-                return_list.append(word)
-                word = ''
-            word += letter
-        if word != '':
-            return_list.append(word)
-        return return_list
-
-    def set_Upper_or_lower(self,word_list):
-        # create dict for lower and upper list
-        lower_set = dict()
-        upper_dic = dict()
-        # run on th Word_list
-        for index in range(len(word_list)):
-            word = word_list[index]  # get the word in index
-            if not word[0].isupper():  # a lower word
-                lower_set[word.lower()] = 0  # add word to lower dic
-                if upper_dic.get(word.upper()) is not None:  # if appear in upper_dic
-                    indexes_list = upper_dic.get(word.upper())  # get list of indexes in list
-                    # run all over list and change to lower
-                    for upper_word_index in indexes_list:
-                        word_list[upper_word_index] = word.lower()
-                    indexes_list = []  # no need to update more
-            elif lower_set.get(word.lower()) is not None:  # Start with capital letter and in lower
-                word_list[index] = word.lower()
-            else:  # only seen as upper
-                list_value = upper_dic.get(word.upper())  # if list already exist
-                # update list if none
-                if list_value is None:
-                    list_value = []
-                list_value.append(index)  # add to list upper word
-                upper_dic[word.upper()] = list_value  # add the list to dic
-                word_list[index] = word.upper() # change to upper word
-        return word_list
+    # def bind_tokens_by_caps(self,list_tokens):
+    #     return_list = []
+    #     prev_string = ""
+    #     for token in list_tokens:
+    #         if token[0].isupper():
+    #             if prev_string == "":
+    #                 prev_string = token
+    #             else:
+    #                 prev_string += ' ' + token
+    #         else:
+    #             if prev_string != '':
+    #                 return_list.append(prev_string)
+    #             return_list.append(token)
+    #             prev_string = ''
+    #     if prev_string != '':
+    #         return_list.append(prev_string)
+    #     return return_list
+    #
+    # def expend_not_shortcut(self,word):
+    #     return_value = word
+    #     index_find = word.find("'")
+    #     if index_find == -1:
+    #         return return_value
+    #     index__find = word.find("'t")
+    #     if index__find != -1:
+    #         if index_find > 0 and word[index_find-1] == 'n':
+    #             index_find = index_find - 1
+    #         return_value = word[0:index_find] + ' not'
+    #     return return_value
+    #
+    # def convert_text_line_to_tokens(self,line):
+    #     return nltk.word_tokenize(line)
+    #
+    # def convert_text_to_lines(self,text):
+    #     return nltk.sent_tokenize(text)
+    #
+    # def find_sub_text_indexes(self,hashtag):
+    #     word = ''
+    #     return_list = []
+    #     for letter in hashtag:
+    #         if letter.isupper():
+    #             if not word.isupper() and len(word) >0 :
+    #                 return_list.append(word)
+    #                 word = ''
+    #         elif word.isupper() and len(word) != 1:
+    #             return_list.append(word)
+    #             word = ''
+    #         word += letter
+    #     if word != '':
+    #         return_list.append(word)
+    #     return return_list
+    #
+    # def set_Upper_or_lower(self,word_list):
+    #     # create dict for lower and upper list
+    #     lower_set = dict()
+    #     upper_dic = dict()
+    #     # run on th Word_list
+    #     for index in range(len(word_list)):
+    #         word = word_list[index]  # get the word in index
+    #         if not word[0].isupper():  # a lower word
+    #             lower_set[word.lower()] = 0  # add word to lower dic
+    #             if upper_dic.get(word.upper()) is not None:  # if appear in upper_dic
+    #                 indexes_list = upper_dic.get(word.upper())  # get list of indexes in list
+    #                 # run all over list and change to lower
+    #                 for upper_word_index in indexes_list:
+    #                     word_list[upper_word_index] = word.lower()
+    #                 indexes_list = []  # no need to update more
+    #         elif lower_set.get(word.lower()) is not None:  # Start with capital letter and in lower
+    #             word_list[index] = word.lower()
+    #         else:  # only seen as upper
+    #             list_value = upper_dic.get(word.upper())  # if list already exist
+    #             # update list if none
+    #             if list_value is None:
+    #                 list_value = []
+    #             list_value.append(index)  # add to list upper word
+    #             upper_dic[word.upper()] = list_value  # add the list to dic
+    #             word_list[index] = word.upper() # change to upper word
+    #     return word_list
 
     def convertURL(self,URL):
         _treebank_word_tokenizer = nltk.NLTKWordTokenizer()
