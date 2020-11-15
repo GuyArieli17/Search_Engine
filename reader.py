@@ -5,6 +5,7 @@ class ReadFile:
     def __init__(self, corpus_path):
         self.corpus_path = corpus_path
         self.filesPath=[]
+        self.dictDocuments={}
     def read_file(self, file_name):
         """
         This function is reading a parquet file contains several tweets

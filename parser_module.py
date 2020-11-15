@@ -5,8 +5,14 @@ from document import Document
 
 class Parse:
     def __init__(self):
+        self.numberList=["thousand","million","billion","percentage","percent"]
         self.stop_words = stopwords.words('english')
-
+        self.dict_stop_words={
+            'a':[],'b':[],'c':[],'d':[],'e':[],'f':[],'g':[],'h':[],'i':[],'j':[],'k':[],'l':[],'m':[],'n':[],
+            'o':[],'p':[],'q':[],'r':[],'s':[],'t':[],'u':[],'v':[],'w':[],'x':[],'y':[],'z':[]
+        }
+        for w in self.stop_words:
+            self.dict_stop_words[w[0]].append(w)
     def parse_sentence(self, text):
         """
         This function tokenize, remove stop words and apply lower case for every word within the text
@@ -14,23 +20,28 @@ class Parse:
         :return:
         """
         text_tokens = word_tokenize(text)
-        i = 0
-        text_tokens_without_stopwords = [w.lower() for w in text_tokens if w not in self.stop_words]
-        text_tokens_with_tags = []
+        text_tokens_without_stopwords = []
         i=0
-        while i!=len(text_tokens_without_stopwords):
-            if text_tokens_without_stopwords[i]=='@':
-                text_tokens_with_tags.append(text_tokens_without_stopwords[i]+text_tokens_without_stopwords[i+1])
-                i+=2
-            else:
-                text_tokens_with_tags.append(text_tokens_without_stopwords[i])
-                i+=1
-        """for i in text_tokens_with_tags:
-            if i[]
-            self.convertURL(i)
-            if i.isdigit():
-                self.convertNumber(i,i+1)"""
-        return text_tokens_with_tags
+        for w in text_tokens:
+            if w[0].lower() in self.dict_stop_words.keys():
+                if w.lower() not in self.dict_stop_words[w[0].lower()] and w.lower() not in self.numberList:
+                    text_tokens_without_stopwords.append(w.lower())
+            elif (w.isascii() and w not in "!#$%&'()*+, -./:;<=>?@[\]^_`{|}~") or w.isnumeric() or w[0]=='#':
+                w=w.replace(",", "")
+                if w.isdigit():
+                    try:
+                        if i==len(text_tokens)-1:
+                            w=self.convertNumber(int(w),"")
+                        else:
+                            w=self.convertNumber(int(w),text_tokens[i+1])
+                    except:
+                        if i==len(text_tokens)-1:
+                            w = self.convertNumber(float(w),"")
+                        else:
+                            w = self.convertNumber(float(w),text_tokens[i+1])
+                text_tokens_without_stopwords.append(w.lower())
+            i+=1
+        return text_tokens_without_stopwords
 
     def parse_doc(self, doc_as_list):
         """
@@ -151,18 +162,19 @@ class Parse:
         return [w for w in lstToken if w not in self.stop_words]
         return lstToken
 
-    def convertNumber(self,num,str):
+    def convertNumber(self,num,s):
         if num>=1000 and num<1000000:
-            return num/1000+'K'
+            return str(num/1000)+'K'
         if num>=1000000 and num<1000000000:
-            return num/1000000+'M'
+            return str(num/1000000)+'M'
         if num>=1000000000:
-            return num/1000000000+'B'
-        if str.lower()=="thousand":
-            return num+'K'
-        if str.lower()=="million":
-            return num+'M'
-        if str.lower()=="billion":
-            return num+'B'
-        if str.lower()=="percent" or str.lower()=="percentage":
-            return num+"%"
+            return str(num/1000000000)+'B'
+        if s.lower()=="thousand":
+            return str(num)+'K'
+        if s.lower()=="million":
+            return str(num)+'M'
+        if s.lower()=="billion":
+            return str(num)+'B'
+        if s.lower()=="percent" or s.lower()=="percentage":
+            return str(num)+"%"
+        return str(num);

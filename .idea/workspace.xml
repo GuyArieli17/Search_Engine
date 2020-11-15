@@ -20,13 +20,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0312bf26-2242-47fa-a353-f94aa30288fc" name="Default Changelist" comment="11/11/2020 16:16">
-      <change beforePath="$PROJECT_DIR$/.idea/Search_Engine.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Search_Engine.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/indexer.py" beforeDir="false" afterPath="$PROJECT_DIR$/indexer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/inverted_idx.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/inverted_idx.pkl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/parser_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/parser_module.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/posting.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/posting.pkl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/reader.py" beforeDir="false" afterPath="$PROJECT_DIR$/reader.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/venv/Lib/site-packages/nltk/tokenize/destructive.py" beforeDir="false" afterPath="$PROJECT_DIR$/venv/Lib/site-packages/nltk/tokenize/destructive.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -220,38 +217,38 @@
       <screen x="0" y="0" width="1366" height="728" />
     </state>
     <state x="463" y="119" key="FileChooserDialogImpl/0.0.1366.728@0.0.1366.728" timestamp="1605351270015" />
-    <state width="1345" height="182" key="GridCell.Tab.0.bottom" timestamp="1605373624429">
+    <state width="1345" height="206" key="GridCell.Tab.0.bottom" timestamp="1605481745887">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state width="1345" height="182" key="GridCell.Tab.0.bottom/0.0.1366.728@0.0.1366.728" timestamp="1605373624429" />
-    <state width="1345" height="182" key="GridCell.Tab.0.center" timestamp="1605373624429">
+    <state width="1345" height="206" key="GridCell.Tab.0.bottom/0.0.1366.728@0.0.1366.728" timestamp="1605481745887" />
+    <state width="1345" height="206" key="GridCell.Tab.0.center" timestamp="1605481745887">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state width="1345" height="182" key="GridCell.Tab.0.center/0.0.1366.728@0.0.1366.728" timestamp="1605373624429" />
-    <state width="1345" height="182" key="GridCell.Tab.0.left" timestamp="1605373624429">
+    <state width="1345" height="206" key="GridCell.Tab.0.center/0.0.1366.728@0.0.1366.728" timestamp="1605481745887" />
+    <state width="1345" height="206" key="GridCell.Tab.0.left" timestamp="1605481745887">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state width="1345" height="182" key="GridCell.Tab.0.left/0.0.1366.728@0.0.1366.728" timestamp="1605373624429" />
-    <state width="1345" height="182" key="GridCell.Tab.0.right" timestamp="1605373624429">
+    <state width="1345" height="206" key="GridCell.Tab.0.left/0.0.1366.728@0.0.1366.728" timestamp="1605481745887" />
+    <state width="1345" height="206" key="GridCell.Tab.0.right" timestamp="1605481745887">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state width="1345" height="182" key="GridCell.Tab.0.right/0.0.1366.728@0.0.1366.728" timestamp="1605373624429" />
-    <state width="1345" height="182" key="GridCell.Tab.1.bottom" timestamp="1605373624430">
+    <state width="1345" height="206" key="GridCell.Tab.0.right/0.0.1366.728@0.0.1366.728" timestamp="1605481745887" />
+    <state width="1345" height="206" key="GridCell.Tab.1.bottom" timestamp="1605481745887">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state width="1345" height="182" key="GridCell.Tab.1.bottom/0.0.1366.728@0.0.1366.728" timestamp="1605373624430" />
-    <state width="1345" height="182" key="GridCell.Tab.1.center" timestamp="1605373624430">
+    <state width="1345" height="206" key="GridCell.Tab.1.bottom/0.0.1366.728@0.0.1366.728" timestamp="1605481745887" />
+    <state width="1345" height="206" key="GridCell.Tab.1.center" timestamp="1605481745887">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state width="1345" height="182" key="GridCell.Tab.1.center/0.0.1366.728@0.0.1366.728" timestamp="1605373624430" />
-    <state width="1345" height="182" key="GridCell.Tab.1.left" timestamp="1605373624430">
+    <state width="1345" height="206" key="GridCell.Tab.1.center/0.0.1366.728@0.0.1366.728" timestamp="1605481745887" />
+    <state width="1345" height="206" key="GridCell.Tab.1.left" timestamp="1605481745887">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state width="1345" height="182" key="GridCell.Tab.1.left/0.0.1366.728@0.0.1366.728" timestamp="1605373624430" />
-    <state width="1345" height="182" key="GridCell.Tab.1.right" timestamp="1605373624430">
+    <state width="1345" height="206" key="GridCell.Tab.1.left/0.0.1366.728@0.0.1366.728" timestamp="1605481745887" />
+    <state width="1345" height="206" key="GridCell.Tab.1.right" timestamp="1605481745887">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state width="1345" height="182" key="GridCell.Tab.1.right/0.0.1366.728@0.0.1366.728" timestamp="1605373624430" />
+    <state width="1345" height="206" key="GridCell.Tab.1.right/0.0.1366.728@0.0.1366.728" timestamp="1605481745887" />
     <state x="321" y="125" key="MultipleFileMergeDialog" timestamp="1605104784133">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
@@ -264,10 +261,10 @@
       <screen x="0" y="0" width="1366" height="728" />
     </state>
     <state x="275" y="97" key="Vcs.Push.Dialog.v2/0.0.1366.728@0.0.1366.728" timestamp="1605104886916" />
-    <state width="691" height="372" key="XDebugger.FullValuePopup" timestamp="1605350450302">
+    <state width="691" height="372" key="XDebugger.FullValuePopup" timestamp="1605466250281">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state width="691" height="372" key="XDebugger.FullValuePopup/0.0.1366.728@0.0.1366.728" timestamp="1605350450302" />
+    <state width="691" height="372" key="XDebugger.FullValuePopup/0.0.1366.728@0.0.1366.728" timestamp="1605466250281" />
     <state x="500" y="278" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1605104864085">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
@@ -277,25 +274,16 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/search_engine.py</url>
-          <line>54</line>
-          <option name="timeStamp" value="30" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/../../../../../../APP/Python/Search_Engine/venv/Lib/site-packages/nltk/tokenize/__init__.py</url>
           <line>128</line>
           <option name="timeStamp" value="34" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/main.py</url>
-          <line>52</line>
-          <option name="timeStamp" value="36" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
         <watch expression="tokenized_text" />
+        <watch expression="w" />
       </configuration>
     </watches-manager>
   </component>
