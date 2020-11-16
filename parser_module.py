@@ -115,6 +115,14 @@ class Parse:
         text_tokens_without_stop_words = []
         text_tokens_with_tags = []
         ignore_next = False
+        index = 0
+        while index < len(text_tokens):
+            lower_w = text_tokens[index].lower()
+            if lower_w == '@' and index < (len(text_tokens) - 1):
+                text_tokens_with_tags.append(lower_w + text_tokens[index + 1])
+                index += 1
+            elif lower_w not in self.stop_words:
+                text_tokens_without_stop_words.append(lower_w)
         for i in range(len(text_tokens)):
             lower_w = text_tokens[i].lower()
             if ignore_next:
