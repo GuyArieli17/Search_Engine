@@ -19,26 +19,32 @@ class Parse:
         :param text:
         :return:
         """
+        if text==None:
+            return []
         text_tokens = word_tokenize(text)
         text_tokens_without_stopwords = []
         i=0
         for w in text_tokens:
-            if w[0].lower() in self.dict_stop_words.keys():
+            if w[-1]!='…' and w[0].lower() in self.dict_stop_words.keys():
                 if w.lower() not in self.dict_stop_words[w[0].lower()] and w.lower() not in self.numberList:
                     text_tokens_without_stopwords.append(w.lower())
-            elif (w.isascii() and w not in "!#$%&'()*+, -./:;<=>?@[\]^_`{|}~") or w.isnumeric() or w[0]=='#':
+            elif ((w.isascii() and w not in "!#$%&'()*+, -./:;<=>?@[\]^_`{|}~") or w.isnumeric() or w[0]=='#') and w[-1]!='…':
                 w=w.replace(",", "")
                 if w.isdigit():
                     try:
                         if i==len(text_tokens)-1:
-                            w=self.convertNumber(int(w),"")
+                            newW=self.convertNumber(int(w),"")
                         else:
-                            w=self.convertNumber(int(w),text_tokens[i+1])
+                            newW=self.convertNumber(int(w),text_tokens[i+1])
                     except:
                         if i==len(text_tokens)-1:
-                            w = self.convertNumber(float(w),"")
+                            newW = self.convertNumber(float(w),"")
                         else:
-                            w = self.convertNumber(float(w),text_tokens[i+1])
+                            newW= self.convertNumber(float(w),text_tokens[i+1])
+                    if newW!=w:
+                        text_tokens_without_stopwords.append(newW.lower())
+                if w[0]=="#":
+                    text_tokens_without_stopwords+=self.find_sub_text_indexes(w)
                 text_tokens_without_stopwords.append(w.lower())
             i+=1
         return text_tokens_without_stopwords
@@ -58,7 +64,7 @@ class Parse:
         quote_text = doc_as_list[6]
         quote_url = doc_as_list[7]
         term_dict = {}
-        tokenized_text = self.parse_sentence(full_text)
+        tokenized_text = self.parse_sentence(full_text)+self.convertURL(url)+self.convertURL(retweet_url)+self.convertURL(quote_url)+self.parse_sentence(retweet_text)+self.parse_sentence(quote_text)
 
         doc_length = len(tokenized_text)  # after text operations.
 
@@ -89,7 +95,7 @@ class Parse:
         if prev_string != '':
             return_list.append(prev_string)
         return return_list
-
+    """
     def expend_not_shortcut(self,word):
         return_value = word
         index_find = word.find("'")
@@ -101,7 +107,7 @@ class Parse:
                 index_find = index_find - 1
             return_value = word[0:index_find] + ' not'
         return return_value
-
+    """
     def convert_text_line_to_tokens(self,line):
         return nltk.word_tokenize(line)
 
@@ -114,14 +120,14 @@ class Parse:
         for letter in hashtag:
             if letter.isupper():
                 if not word.isupper() and len(word) >0 :
-                    return_list.append(word)
+                    return_list.append(word.lower())
                     word = ''
             elif word.isupper() and len(word) != 1:
-                return_list.append(word)
+                return_list.append(word.lower())
                 word = ''
             word += letter
         if word != '':
-            return_list.append(word)
+            return_list.append(word.lower())
         return return_list
 
     def set_Upper_or_lower(self,word_list):
@@ -152,17 +158,22 @@ class Parse:
         return word_list
 
     def convertURL(self,URL):
+        if URL==None:
+            return []
         _treebank_word_tokenizer = nltk.NLTKWordTokenizer()
         lst=URL.split('/')
         y=[token for sent in lst for token in _treebank_word_tokenizer.tokenize(sent)]
         lstToken=[]
         for i in y:
-            if i[0].isalpha() or i[0].isdigit():
+            if (i[0].isalpha() or i[0].isdigit()) and i not in self.dict_stop_words.keys():
                 lstToken.append(i)
-        return [w for w in lstToken if w not in self.stop_words]
         return lstToken
 
     def convertNumber(self,num,s):
+        if num==None or s==None:
+            return ""
+        if num<1000:
+            return str(num)
         if num>=1000 and num<1000000:
             return str(num/1000)+'K'
         if num>=1000000 and num<1000000000:
@@ -177,4 +188,7 @@ class Parse:
             return str(num)+'B'
         if s.lower()=="percent" or s.lower()=="percentage":
             return str(num)+"%"
-        return str(num);
+if __name__ == '__main__':
+    p=Parse()
+    x=p.parse_sentence("ayman average is a 90 percentage")
+    print(x)
