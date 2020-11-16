@@ -50,7 +50,7 @@ if __name__ == '__main__':
     for line in list:
         print(bind_tokens_by_caps(convert_text_line_to_tokens(line)))
     print('---------------------')"""
-    search_engine.run_engine()
+    search_engine.main()
     # print(bind_tokens_by_caps(['Avangers', 'Guy']))
     # bt = nltk.tag.
     # print(bt)

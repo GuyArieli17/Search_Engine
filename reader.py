@@ -5,6 +5,9 @@ class ReadFile:
     def __init__(self, corpus_path):
         self.corpus_path = corpus_path
         self.filesPath=[]
+        self.dictDocuments={}
+       # self.readCorpus()
+       # self.readAllTheFiles()
     def read_file(self, file_name):
         """
         This function is reading a parquet file contains several tweets
@@ -27,8 +30,6 @@ class ReadFile:
                     if file.endswith(".parquet"):
                         self.filesPath.append(folder+'\\'+file)
 
-    """  def readAllTheFiles(self):
-        j=0
+    def readAllTheFiles(self):
         for i in self.filesPath:
-            self.files[j]=self.read_file(i)
-            j+=1"""
+            self.dictDocuments[i]=self.read_file(i)
