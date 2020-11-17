@@ -6,8 +6,8 @@ class ReadFile:
         self.corpus_path = corpus_path
         self.filesPath=[]
         self.dictDocuments={}
-       # self.readCorpus()
-       # self.readAllTheFiles()
+        self.readCorpus()
+      #  self.readAllTheFiles()
     def read_file(self, file_name):
         """
         This function is reading a parquet file contains several tweets
@@ -20,16 +20,19 @@ class ReadFile:
         return df.values.tolist()
 
     def readCorpus(self):
-        listFolders=os.listdir(self.corpus_path)
-        for folder in listFolders:
-            if folder.endswith(".parquet"):
-                self.filesPath.append(folder)
-            elif os.path.isdir(self.corpus_path+'\\'+folder):
-                listFiles=os.listdir(self.corpus_path+'\\'+folder)
-                for file in listFiles:
-                    if file.endswith(".parquet"):
-                        self.filesPath.append(folder+'\\'+file)
-
+        if self.corpus_path!='':
+            listFolders=os.listdir(self.corpus_path)
+            for folder in listFolders:
+                if folder.endswith(".parquet"):
+                    self.filesPath.append(folder)
+                elif os.path.isdir(self.corpus_path+'\\'+folder):
+                    listFiles=os.listdir(self.corpus_path+'\\'+folder)
+                    for file in listFiles:
+                        if file.endswith(".parquet"):
+                            self.filesPath.append(folder+'\\'+file)
+    """
     def readAllTheFiles(self):
-        for i in self.filesPath:
-            self.dictDocuments[i]=self.read_file(i)
+        if len(self.filesPath)>0:
+            for i in self.filesPath:
+                self.dictDocuments[i]=self.read_file(i)
+    """

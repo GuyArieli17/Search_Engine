@@ -59,12 +59,19 @@ class Parse:
         tweet_date = doc_as_list[1]
         full_text = doc_as_list[2]
         url = doc_as_list[3]
-        retweet_text = doc_as_list[4]
-        retweet_url = doc_as_list[5]
-        quote_text = doc_as_list[6]
-        quote_url = doc_as_list[7]
+        indices=doc_as_list[4]
+        retweet_text=doc_as_list[5]
+        retweet_urls=doc_as_list[6]
+        retweet_indices=doc_as_list[7]
+        quoted_text=doc_as_list[8]
+        quote_urls=doc_as_list[9]
+        quoted_indices=doc_as_list[10]
+        retweet_quoted_text=doc_as_list[11]
+        retweet_quoted_urls=doc_as_list[12]
+        retweet_quoted_indice=doc_as_list[13]
         term_dict = {}
-        tokenized_text = self.parse_sentence(full_text)+self.convertURL(url)+self.convertURL(retweet_url)+self.convertURL(quote_url)+self.parse_sentence(retweet_text)+self.parse_sentence(quote_text)
+        tokenized_text = self.parse_sentence(full_text)+self.convertURL(url)+self.convertURL(retweet_urls)\
+                         +self.convertURL(quote_urls)+self.parse_sentence(retweet_text)+self.parse_sentence(quoted_text)
 
         doc_length = len(tokenized_text)  # after text operations.
 
@@ -74,8 +81,8 @@ class Parse:
             else:
                 term_dict[term] += 1
 
-        document = Document(tweet_id, tweet_date, full_text, url, retweet_text, retweet_url, quote_text,
-                            quote_url, term_dict, doc_length)
+        document = Document(tweet_id, tweet_date, full_text, url,indices,retweet_text,retweet_urls,retweet_indices,
+                            quoted_text,quote_urls,quoted_indices,retweet_quoted_text,retweet_quoted_urls,retweet_quoted_indice,term_dict,doc_length)
         return document
 
     def bind_tokens_by_caps(self,list_tokens):
@@ -172,8 +179,6 @@ class Parse:
     def convertNumber(self,num,s):
         if num==None or s==None:
             return ""
-        if num<1000:
-            return str(num)
         if num>=1000 and num<1000000:
             return str(num/1000)+'K'
         if num>=1000000 and num<1000000000:
@@ -188,6 +193,24 @@ class Parse:
             return str(num)+'B'
         if s.lower()=="percent" or s.lower()=="percentage":
             return str(num)+"%"
+        return str(num)
+
+    def diceStemmers(self,word):
+        lst1 = self.breakingDownWord(word)
+        for w in self.inverted_idx.keys():
+            count=0
+            lst2=self.breakingDownWord(w)
+            UnionList = list(set(lst1) | set(lst2))
+            for i in lst1:
+                count += lst2.count(i)
+            if count/len(UnionList)>=0.8:
+                return w
+        return word
+
+    def breakingDownWord(self,word):
+        n = 2
+        y=[word[i:i + n] for i in range(0, len(word), 1)]
+        return y[:len(y)-1]
 if __name__ == '__main__':
     p=Parse()
     x=p.parse_sentence("ayman average is a 90 percentage")
