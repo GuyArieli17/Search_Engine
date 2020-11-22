@@ -1,9 +1,12 @@
+import time
+
 from reader import ReadFile
 from configuration import ConfigClass
 from parser_module import Parse
 from indexer import Indexer
 from searcher import Searcher
 import utils
+from stemmer import Stemmer
 
 
 def run_engine(corpus_path,output_path,stemming,queries,num_docs_to_retrieve):
@@ -15,19 +18,22 @@ def run_engine(corpus_path,output_path,stemming,queries,num_docs_to_retrieve):
 
     config = ConfigClass(corpus_path,output_path,stemming)
     r = ReadFile(corpus_path=config.get__corpusPath())
-    p = Parse()
-    indexer = Indexer(config)
+    p = Parse(stemming)
+    indexer = Indexer(config,p.terms_dic_to_document)
 
   #  documents_list = r.read_file(file_name='sample3.parquet')
     # Iterate over every document in the file
     for i in r.filesPath:
         documents_list=r.read_file(i)
+        start_time = time.time()
         for idx, document in enumerate(documents_list):
             # parse the document
+            #print(idx)
             parsed_document = p.parse_doc(document)
             number_of_documents += 1
             # index the document data
             indexer.add_new_doc(parsed_document)
+        print(time.time() - start_time)
     print('Finished parsing and indexing. Starting to export files')
 
     utils.save_obj(indexer.inverted_idx, "inverted_idx")
