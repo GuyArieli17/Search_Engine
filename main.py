@@ -46,9 +46,7 @@ def convert_text_to_lines(text):
 
 if __name__ == '__main__':
 
-    start_time = time.time()
     search_engine.main("C:\\Users\\ayman\\Downloads\\Data", "", False, [], 5)
-    print("--- %s seconds ---" % (time.time() - start_time))
     """regex_example = "Avengers: Infinity War was a 2018 American superhero film based on the Marvel Comics superhero team the Avengers. It is the 19th film in the Marvel Cinematic Universe (MCU). The running time of the movie was 149 minutes and the box office collection was around 2 billion dollars. (Source: Wikipedia)"
     list = convert_text_to_lines(regex_example)
     for line in list:

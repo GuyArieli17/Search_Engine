@@ -19,14 +19,17 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0312bf26-2242-47fa-a353-f94aa30288fc" name="Default Changelist" comment="16/11/2020 21:20">
+    <list default="true" id="0312bf26-2242-47fa-a353-f94aa30288fc" name="Default Changelist" comment="17/11/2020 11:26">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/configuration.py" beforeDir="false" afterPath="$PROJECT_DIR$/configuration.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/document.py" beforeDir="false" afterPath="$PROJECT_DIR$/document.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/indexer.py" beforeDir="false" afterPath="$PROJECT_DIR$/indexer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/inverted_idx.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/inverted_idx.pkl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/parser_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/parser_module.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reader.py" beforeDir="false" afterPath="$PROJECT_DIR$/reader.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/posting.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/posting.pkl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/search_engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/search_engine.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stemmer.py" beforeDir="false" afterPath="$PROJECT_DIR$/stemmer.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/venv/Lib/site-packages/nltk/tokenize/destructive.py" beforeDir="false" afterPath="$PROJECT_DIR$/venv/Lib/site-packages/nltk/tokenize/destructive.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -61,12 +64,34 @@
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/indexer.py" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../../../../pythonProject" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RunManager" selected="Python.main">
+    <configuration name="ex4_012345678" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Search_Engine" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$USER_HOME$/Downloads" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$USER_HOME$/Downloads/ex4_012345678.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="indexer" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="Search_Engine" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -131,7 +156,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="reader" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="stemmer" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Search_Engine" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -143,8 +168,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/reader.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/stemmer.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -154,17 +178,19 @@
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="Python.ex4_012345678" />
       <item itemvalue="Python.indexer" />
-      <item itemvalue="Python.reader" />
       <item itemvalue="Python.main" />
       <item itemvalue="Python.parser_module" />
+      <item itemvalue="Python.stemmer" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.main" />
-        <item itemvalue="Python.parser_module" />
+        <item itemvalue="Python.stemmer" />
         <item itemvalue="Python.indexer" />
-        <item itemvalue="Python.reader" />
+        <item itemvalue="Python.parser_module" />
+        <item itemvalue="Python.ex4_012345678" />
       </list>
     </recent_temporary>
   </component>
@@ -204,7 +230,13 @@
       <option name="presentableId" value="LOCAL‎00004" />
       <updated>1605554436870</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL‎00005" summary="17/11/2020 11:26">
+      <created>1605605172182</created>
+      <option name="number" value="LOCAL‎00005" />
+      <option name="presentableId" value="LOCAL‎00005" />
+      <updated>1605605172182</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TodoView">
@@ -235,7 +267,8 @@
     <MESSAGE value="11/11/2020 16:16" />
     <MESSAGE value="16/11/2020 01:10" />
     <MESSAGE value="16/11/2020 21:20" />
-    <option name="LAST_COMMIT_MESSAGE" value="16/11/2020 21:20" />
+    <MESSAGE value="17/11/2020 11:26" />
+    <option name="LAST_COMMIT_MESSAGE" value="17/11/2020 11:26" />
   </component>
   <component name="WindowStateProjectService">
     <state x="137" y="14" width="1092" height="714" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1605351278622">
@@ -250,46 +283,46 @@
       <screen x="0" y="0" width="1366" height="728" />
     </state>
     <state x="413" y="111" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1366.728@0.0.1366.728" timestamp="1605023390939" />
-    <state width="937" height="466" key="DebuggerActiveHint" timestamp="1605569734583">
+    <state width="937" height="466" key="DebuggerActiveHint" timestamp="1605719961832">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state width="937" height="466" key="DebuggerActiveHint/0.0.1366.728@0.0.1366.728" timestamp="1605569734583" />
-    <state x="463" y="119" key="FileChooserDialogImpl" timestamp="1605351270015">
+    <state width="937" height="466" key="DebuggerActiveHint/0.0.1366.728@0.0.1366.728" timestamp="1605719961832" />
+    <state x="463" y="119" key="FileChooserDialogImpl" timestamp="1605637132496">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state x="463" y="119" key="FileChooserDialogImpl/0.0.1366.728@0.0.1366.728" timestamp="1605351270015" />
-    <state width="1345" height="237" key="GridCell.Tab.0.bottom" timestamp="1605601899937">
+    <state x="463" y="119" key="FileChooserDialogImpl/0.0.1366.728@0.0.1366.728" timestamp="1605637132496" />
+    <state width="1345" height="188" key="GridCell.Tab.0.bottom" timestamp="1605985428572">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state width="1345" height="237" key="GridCell.Tab.0.bottom/0.0.1366.728@0.0.1366.728" timestamp="1605601899937" />
-    <state width="1345" height="237" key="GridCell.Tab.0.center" timestamp="1605601899937">
+    <state width="1345" height="188" key="GridCell.Tab.0.bottom/0.0.1366.728@0.0.1366.728" timestamp="1605985428572" />
+    <state width="1345" height="188" key="GridCell.Tab.0.center" timestamp="1605985428572">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state width="1345" height="237" key="GridCell.Tab.0.center/0.0.1366.728@0.0.1366.728" timestamp="1605601899937" />
-    <state width="1345" height="237" key="GridCell.Tab.0.left" timestamp="1605601899937">
+    <state width="1345" height="188" key="GridCell.Tab.0.center/0.0.1366.728@0.0.1366.728" timestamp="1605985428572" />
+    <state width="1345" height="188" key="GridCell.Tab.0.left" timestamp="1605985428572">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state width="1345" height="237" key="GridCell.Tab.0.left/0.0.1366.728@0.0.1366.728" timestamp="1605601899937" />
-    <state width="1345" height="237" key="GridCell.Tab.0.right" timestamp="1605601899937">
+    <state width="1345" height="188" key="GridCell.Tab.0.left/0.0.1366.728@0.0.1366.728" timestamp="1605985428572" />
+    <state width="1345" height="188" key="GridCell.Tab.0.right" timestamp="1605985428572">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state width="1345" height="237" key="GridCell.Tab.0.right/0.0.1366.728@0.0.1366.728" timestamp="1605601899937" />
-    <state width="1345" height="270" key="GridCell.Tab.1.bottom" timestamp="1605572165623">
+    <state width="1345" height="188" key="GridCell.Tab.0.right/0.0.1366.728@0.0.1366.728" timestamp="1605985428572" />
+    <state width="1345" height="166" key="GridCell.Tab.1.bottom" timestamp="1605985428510">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state width="1345" height="270" key="GridCell.Tab.1.bottom/0.0.1366.728@0.0.1366.728" timestamp="1605572165623" />
-    <state width="1345" height="270" key="GridCell.Tab.1.center" timestamp="1605572165623">
+    <state width="1345" height="166" key="GridCell.Tab.1.bottom/0.0.1366.728@0.0.1366.728" timestamp="1605985428510" />
+    <state width="1345" height="166" key="GridCell.Tab.1.center" timestamp="1605985428510">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state width="1345" height="270" key="GridCell.Tab.1.center/0.0.1366.728@0.0.1366.728" timestamp="1605572165623" />
-    <state width="1345" height="270" key="GridCell.Tab.1.left" timestamp="1605572165623">
+    <state width="1345" height="166" key="GridCell.Tab.1.center/0.0.1366.728@0.0.1366.728" timestamp="1605985428510" />
+    <state width="1345" height="166" key="GridCell.Tab.1.left" timestamp="1605985428510">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state width="1345" height="270" key="GridCell.Tab.1.left/0.0.1366.728@0.0.1366.728" timestamp="1605572165623" />
-    <state width="1345" height="270" key="GridCell.Tab.1.right" timestamp="1605572165623">
+    <state width="1345" height="166" key="GridCell.Tab.1.left/0.0.1366.728@0.0.1366.728" timestamp="1605985428510" />
+    <state width="1345" height="166" key="GridCell.Tab.1.right" timestamp="1605985428510">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state width="1345" height="270" key="GridCell.Tab.1.right/0.0.1366.728@0.0.1366.728" timestamp="1605572165623" />
+    <state width="1345" height="166" key="GridCell.Tab.1.right/0.0.1366.728@0.0.1366.728" timestamp="1605985428510" />
     <state x="321" y="125" key="MultipleFileMergeDialog" timestamp="1605104784133">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
@@ -298,14 +331,14 @@
       <screen x="0" y="0" width="1366" height="728" />
     </state>
     <state x="184" y="9" key="SettingsEditor/0.0.1366.728@0.0.1366.728" timestamp="1605286114782" />
-    <state x="275" y="97" key="Vcs.Push.Dialog.v2" timestamp="1605554443818">
+    <state x="275" y="97" key="Vcs.Push.Dialog.v2" timestamp="1605605178098">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state x="275" y="97" key="Vcs.Push.Dialog.v2/0.0.1366.728@0.0.1366.728" timestamp="1605554443818" />
-    <state width="691" height="372" key="XDebugger.FullValuePopup" timestamp="1605570679571">
+    <state x="275" y="97" key="Vcs.Push.Dialog.v2/0.0.1366.728@0.0.1366.728" timestamp="1605605178098" />
+    <state width="691" height="372" key="XDebugger.FullValuePopup" timestamp="1605896641176">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state width="691" height="372" key="XDebugger.FullValuePopup/0.0.1366.728@0.0.1366.728" timestamp="1605570679571" />
+    <state width="691" height="372" key="XDebugger.FullValuePopup/0.0.1366.728@0.0.1366.728" timestamp="1605896641176" />
     <state x="500" y="278" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1605605152227">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
@@ -320,15 +353,47 @@
           <option name="timeStamp" value="34" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/venv/Lib/site-packages/nltk/tokenize/destructive.py</url>
+          <line>109</line>
+          <option name="timeStamp" value="101" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/parser_module.py</url>
+          <line>278</line>
+          <option name="timeStamp" value="123" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/indexer.py</url>
+          <line>40</line>
+          <option name="timeStamp" value="173" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/stemmer.py</url>
+          <line>18</line>
+          <option name="timeStamp" value="186" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/parser_module.py</url>
+          <line>123</line>
+          <option name="timeStamp" value="201" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/search_engine.py</url>
-          <line>22</line>
-          <option name="timeStamp" value="66" />
+          <line>58</line>
+          <option name="timeStamp" value="224" />
         </line-breakpoint>
       </breakpoints>
+      <default-breakpoints>
+        <breakpoint type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
     </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
-        <watch expression="tokenized_text" />
+        <watch expression="tokenized_text" language="Python" />
         <watch expression="w" />
       </configuration>
     </watches-manager>

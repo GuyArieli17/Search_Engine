@@ -10,3 +10,6 @@ class ConfigClass:
 
     def get__corpusPath(self):
         return self.corpusPath
+
+    def get_stemmig(self):
+        return self.toStem

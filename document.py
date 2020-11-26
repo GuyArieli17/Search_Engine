@@ -2,7 +2,7 @@
 class Document:
     def __init__(self,tweet_id, tweet_date=None, full_text=None, url=None, indices=None, retweet_text=None, retweet_urls=None, retweet_indices=None,
              quoted_text=None, quote_urls=None, quoted_indices=None, retweet_quoted_text=None, retweet_quoted_urls=None, retweet_quoted_indice=None,
-             term_doc_dictionary=None,doc_length=0):
+             term_doc_dictionary=None):
         """
         :param tweet_id: tweet id
         :param tweet_date: tweet date
@@ -30,4 +30,4 @@ class Document:
         self.retweet_quoted_urls=retweet_quoted_urls
         self.retweet_quoted_indice = retweet_quoted_indice
         self.term_doc_dictionary = term_doc_dictionary
-        self.doc_length = doc_length
+       #self.doc_length = doc_length
