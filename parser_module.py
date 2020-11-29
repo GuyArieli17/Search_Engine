@@ -94,10 +94,10 @@ class Parse:
             lst = self.addToken(lst, term, term_dict)
         return lst
 
-    def addToEntitys(self, word):
+    def addToEntitys(self, word,term_dict):
         if word in self.entitys:
             self.entitys.remove(word)
-            self.add_term_to_dict(word)
+            self.add_term_to_dict(word,term_dict)
         else:
             self.entitys.add(word)
 
@@ -119,10 +119,10 @@ class Parse:
                         lst[-1] += self.numberList[word.lower()]  # add dymbol
                         self.add_term_numbers_to_dict(lst[-1], term_dict)
                 # if this and prev are upper creante a new Term
-                if lst[-1] in self.upper_set and word[0].isupper():
+                if len(lst) > 0 and lst[-1] in self.upper_set and word[0].isupper():
                     lst[-1] += word
                     word2 = lst[-1] + word
-                    self.addToEntitys(word2)
+                    self.addToEntitys(word2,term_dict)
                 lst.append(word.lower())
                 self.add_term_to_dict(word, term_dict)
         # if not emoji and not a wiired symbol  or a number or # not end in ... or start with '
