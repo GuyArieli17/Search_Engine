@@ -10,6 +10,10 @@ class Ranker:
         :param relevant_doc: dictionary of documents that contains at least one term from the query.
         :return: sorted list of documents by score
         """
+        # tf-idf => 
+        # apple computers 
+        # apple mac book = > apple computer mac-book
+        # 
         return sorted(relevant_doc.items(), key=lambda item: item[1], reverse=True)
 
     @staticmethod

@@ -19,6 +19,7 @@ class Indexer:
         document_dictionary = document.term_doc_dictionary
         # Go over each term in the doc
         for term in document_dictionary.keys():
+            # write pos in disc and import it and work with it 
             try:
                 # Update posting
                 if term.lower() in self.inverted_idx.keys():
@@ -32,7 +33,7 @@ class Indexer:
                     if term.upper() not in self.postingDict.keys():
                         self.postingDict[term.upper()]=[]
                     self.postingDict[term.upper()].append((document.tweet_id, document_dictionary[term]))
-
+                    # 
             except:
                 print('problem with the following key {}'.format(term[0]))
 

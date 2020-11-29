@@ -1,5 +1,4 @@
 import time
-
 from reader import ReadFile
 from configuration import ConfigClass
 from parser_module import Parse
