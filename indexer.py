@@ -22,6 +22,7 @@ class Indexer:
         :param document: a document need to be indexed.
         :return: -
         """
+        #hope ypu cann see mapRduce
         max_term_list = dict()
         document_dictionary = document.term_doc_dictionary
         number_of_terms = 0
