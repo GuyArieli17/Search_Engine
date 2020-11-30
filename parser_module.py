@@ -24,12 +24,15 @@ class Parse:
         for w in self.stop_words:
             self.dict_stop_words[w[0]].append(w)
         # all operator we dont want
-        self.operators = {'*', '+', '-', '/',
+        operators = {'*', '+', '-', '/',
                           '<', '>', '&', '=', '|', '~', '"'}
         # all parentheses character
-        self.parentheses = {'(', ')', '[', ']', '{', '}'}
+        parentheses = {'(', ')', '[', ']', '{', '}'}
         # all separators character
-        self.separators = {',', ';', ':', ' '}
+        separators = {',', ';', ':', ' '}
+
+        self.skip_list = operators.union(
+            parentheses).union(separators).union('\n')
         # all wired symbols
         self.wird_symbols = {'!', '#', '$', '%', '&', '(', ')', ',', '*', '+', '-', '.', '/', ':', ';', '<', '=', '>', '?',
                              '@', '[', "'\'", ']', '^', '`', '{', '|', '}', '~', '}'}
@@ -84,7 +87,7 @@ class Parse:
         prev_term = ''  # start with empty
         for character in text:
             # make sure character is not int the forbiden list (divide word)
-            if character not in self.operators and character not in self.parentheses and character not in self.separators and character != '\n':
+            if character not in self.skip_list:
                 term += character  # keep building the term
             if (character == ' ' or character == '/' or character == ":" or character == '"' or character == '\n') and len(term) > 0:
                 self.addToken(prev_term, term, term_dict)
