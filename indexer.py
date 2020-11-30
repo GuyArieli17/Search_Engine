@@ -2,8 +2,8 @@ from MapReduce import MapReduce
 from nltk.corpus import util
 from configuration import ConfigClass
 from parser_module import Parse
-import utils
-
+import psutil
+import sys
 
 class Indexer:
 
@@ -13,7 +13,11 @@ class Indexer:
         self.fileName = 'InvertedIndex'
         self.config = config
         # {term: [ordered list where appear : (file_id , lineNumber)]}
-        self.map_reduce = MapReduce()
+        avg_ram = (psutil.virtual_memory().available // 7)
+        self.avg_length = (avg_ram // sys.getsizeof((int(), str()))) // (8/10)
+        self.map_reduce = MapReduce(self.avg_length)
+        self.tmp_pos = dict()
+
 
     def add_new_doc(self, document):
         """
@@ -22,7 +26,6 @@ class Indexer:
         :param document: a document need to be indexed.
         :return: -
         """
-        #hope ypu cann see mapRduce
         max_term_list = dict()
         document_dictionary = document.term_doc_dictionary
         number_of_terms = 0
@@ -33,7 +36,13 @@ class Indexer:
             else:
                 max_term_list[term] = 1
             try:
-                self.map_reduce.write_in(term,(document.tweet_id, document_dictionary[term]))
+                if len(self.tmp_pos) >= self.avg_length:
+                    self.map_reduce.write_dict(self.tmp_pos)
+                    self.tmp_pos.clear()
+                lower_term = term.lower
+                if lower_term not in self.postingDict.keys():
+                    self.tmp_pos[lower_term] = []
+                self.tmp_pos[lower_term].append((document.tweet_id, document_dictionary[term]))
             except:
                 print('problem with the following key {}'.format(term[0]))
         # max_term = max(max_term_list.keys())
