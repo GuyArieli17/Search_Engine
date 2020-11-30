@@ -36,9 +36,9 @@ class Indexer:
             else:
                 max_term_list[term] = 1
             try:
-                if len(self.tmp_pos) >= self.avg_length:
-                    self.map_reduce.write_dict(self.tmp_pos)
-                    self.tmp_pos.clear()
+                # if len(self.tmp_pos) >= self.avg_length:
+                #     self.map_reduce.write_dict(self.tmp_pos)
+                #     self.tmp_pos.clear()
                 lower_term = term.lower
                 if lower_term not in self.postingDict.keys():
                     self.tmp_pos[lower_term] = []
