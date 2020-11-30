@@ -19,17 +19,8 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0312bf26-2242-47fa-a353-f94aa30288fc" name="Default Changelist" comment="17/11/2020 11:26">
+    <list default="true" id="0312bf26-2242-47fa-a353-f94aa30288fc" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/indexer.py" beforeDir="false" afterPath="$PROJECT_DIR$/indexer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ranker.py" beforeDir="false" afterPath="$PROJECT_DIR$/ranker.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/search_engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/search_engine.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/searcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/searcher.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/venv/nltk_data/corpora/stopwords.zip" beforeDir="false" afterPath="$PROJECT_DIR$/venv/nltk_data/corpora/stopwords.zip" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/venv/nltk_data/corpora/stopwords/english" beforeDir="false" afterPath="$PROJECT_DIR$/venv/nltk_data/corpora/stopwords/english" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -39,7 +30,7 @@
   </component>
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/Search_Engine$reader.coverage" NAME="reader Coverage Results" MODIFIED="1604953046854" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Search_Engine$main.coverage" NAME="main Coverage Results" MODIFIED="1606767232746" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Search_Engine$main.coverage" NAME="main Coverage Results" MODIFIED="1606768902399" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Search_Engine$setup.coverage" NAME="setup Coverage Results" MODIFIED="1606757302080" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="FUSProjectUsageTrigger">
@@ -47,23 +38,23 @@
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="pkl" value="1" />
-          <entry key="py" value="10" />
+          <entry key="py" value="11" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="PLAIN_TEXT" value="1" />
-          <entry key="Python" value="10" />
+          <entry key="Python" value="11" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="277" />
+          <entry key="py" value="519" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="277" />
+          <entry key="Python" value="519" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.lifecycle.project">
@@ -89,7 +80,7 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/search_engine.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="272">
@@ -101,11 +92,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/indexer.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="215">
-              <caret line="27" selection-start-line="27" selection-end-line="27" />
+            <state relative-caret-position="317">
+              <caret line="33" column="16" lean-forward="true" selection-start-line="33" selection-start-column="16" selection-end-line="33" selection-end-column="16" />
               <folding>
                 <element signature="e#0#31#0" expanded="true" />
               </folding>
@@ -114,40 +105,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/reader.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="356">
-              <caret line="23" selection-start-line="23" selection-end-line="23" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/setup.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="136">
-              <caret line="8" selection-start-line="8" selection-end-line="8" />
-              <folding>
-                <element signature="e#0#11#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/main.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="51">
-              <caret line="3" selection-start-line="3" selection-end-line="3" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/MapReduce.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="188">
-              <caret line="40" selection-start-line="40" selection-end-line="40" />
+            <state relative-caret-position="378">
+              <caret line="58" column="49" lean-forward="true" selection-start-line="58" selection-start-column="49" selection-end-line="58" selection-end-column="49" />
             </state>
           </provider>
         </entry>
@@ -195,9 +156,9 @@
         <option value="$PROJECT_DIR$/ReadWrite.py" />
         <option value="$PROJECT_DIR$/setup.py" />
         <option value="$PROJECT_DIR$/main.py" />
+        <option value="$PROJECT_DIR$/search_engine.py" />
         <option value="$PROJECT_DIR$/MapReduce.py" />
         <option value="$PROJECT_DIR$/indexer.py" />
-        <option value="$PROJECT_DIR$/search_engine.py" />
       </list>
     </option>
   </component>
@@ -468,7 +429,14 @@
       <option name="project" value="LOCAL" />
       <updated>1606749017958</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="17/11/2020 11:26">
+      <created>1606767245439</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1606767245439</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TodoView">
@@ -489,8 +457,8 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.20171674" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.3969957" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.20171674" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.3969957" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -630,11 +598,6 @@
           <line>20</line>
           <option name="timeStamp" value="186" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/indexer.py</url>
-          <line>34</line>
-          <option name="timeStamp" value="245" />
-        </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
@@ -698,13 +661,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/MapReduce.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="188">
-          <caret line="40" selection-start-line="40" selection-end-line="40" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="51">
@@ -729,22 +685,36 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/indexer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="215">
-          <caret line="27" selection-start-line="27" selection-end-line="27" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/search_engine.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="272">
           <caret line="33" column="8" selection-start-line="33" selection-start-column="8" selection-end-line="33" selection-end-column="8" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="418">
+          <caret line="1663" selection-start-line="1663" selection-end-line="1664" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MapReduce.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="378">
+          <caret line="58" column="49" lean-forward="true" selection-start-line="58" selection-start-column="49" selection-end-line="58" selection-end-column="49" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/indexer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="317">
+          <caret line="33" column="16" lean-forward="true" selection-start-line="33" selection-start-column="16" selection-end-line="33" selection-end-column="16" />
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
           </folding>
         </state>
       </provider>
