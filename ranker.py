@@ -2,6 +2,10 @@ class Ranker:
     def __init__(self):
         pass
 
+
+    
+
+
     @staticmethod
     def rank_relevant_doc(relevant_doc):
         """

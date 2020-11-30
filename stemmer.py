@@ -1,9 +1,9 @@
-from nltk.stem import snowball
+from nltk.stem import snowball, PorterStemmer
 
 
 class Stemmer:
     def __init__(self):
-        self.stemmer = snowball.SnowballStemmer("english")
+        self.stemmer = PorterStemmer()  # snowball.SnowballStemmer("english")
 
     def stem_term(self, word):
         """
@@ -11,13 +11,14 @@ class Stemmer:
         :param token: string of a token
         :return: stemmed token
         """
-        if word[0]!='#' and word[0]!='@' and word.isalpha():
+        if word[0] != '#' and word[0] != '@' and word.isalpha():
             return self.stemmer.stem(word)
         return word
 
+
 if __name__ == '__main__':
-    s=Stemmer()
-    x=s.stem_term("caressesdasdasd")
+    s = Stemmer()
+    x = s.stem_term("caressesdasdasd")
     print(x)
 
     """
