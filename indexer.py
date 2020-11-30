@@ -14,9 +14,10 @@ class Indexer:
         self.config = config
         # {term: [ordered list where appear : (file_id , lineNumber)]}
         avg_ram = (psutil.virtual_memory().available // 7)
-        self.avg_length = (avg_ram // sys.getsizeof((int(), str()))) // (8/10)
+        self.avg_length =(avg_ram // sys.getsizeof((int(), str()))) // (8/10)
         self.map_reduce = MapReduce(self.avg_length)
-        self.tmp_pos = dict()
+        self.tmp_pos = {}
+        self.num_in_pos_tmp = 0
 
 
     def add_new_doc(self, document):
@@ -36,13 +37,15 @@ class Indexer:
             else:
                 max_term_list[term] = 1
             try:
-                # if len(self.tmp_pos) >= self.avg_length:
-                #     self.map_reduce.write_dict(self.tmp_pos)
-                #     self.tmp_pos.clear()
-                lower_term = term.lower
-                if lower_term not in self.postingDict.keys():
-                    self.tmp_pos[lower_term] = []
-                self.tmp_pos[lower_term].append((document.tweet_id, document_dictionary[term]))
+                if self.num_in_pos_tmp >= self.avg_length:
+                    print('Write in file')
+                    self.map_reduce.write_dict(self.tmp_pos)
+                    self.tmp_pos.clear()
+                    self.num_in_pos_tmp = 0
+                if term.lower() not in self.tmp_pos.keys():
+                    self.tmp_pos[term.lower()] = []
+                self.tmp_pos[term.lower()].append((document.tweet_id, document_dictionary[term]))
+                self.num_in_pos_tmp += 1
             except:
                 print('problem with the following key {}'.format(term[0]))
         # max_term = max(max_term_list.keys())
