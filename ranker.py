@@ -45,10 +45,17 @@ class Ranker:
             info_list.insert(0, doc_score)
         # sort by the score
         return (sorted(relevant_doc.items(), key=lambda item: item[1], reverse=True))[:number_of_doc]
-
+    
+    #doc_id - > 
     @staticmethod
     def create_c_of_doc(doc_ferquince):
-        
+        # [123213,12321313,123213213,12312312] 
+        # (term1,term2)
+        # apple -> pc 
+        # cij = sum[d-> rleventDoc](fik * fjk)
+        # c(term_qurey,term_dic) = sum([])
+        # doc_term[term_i] * doc_term[term_j]
+        #   {term: {'other term' : value}}
         pass
         
 
@@ -108,7 +115,6 @@ class Ranker:
         :param relevant_doc: dictionary of documents that contains at least one term from the query.
         :return: sorted list of documents by score
         """
-
         # sort by the score
         return sorted(relevant_doc.items(), key=lambda item: item[1], reverse=True)
 

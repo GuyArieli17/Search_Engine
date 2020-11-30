@@ -1,5 +1,8 @@
+from MapReduce import MapReduce
+from nltk.corpus import util
 from configuration import ConfigClass
 from parser_module import Parse
+import utils
 
 
 class Indexer:
@@ -7,7 +10,10 @@ class Indexer:
     def __init__(self, config, all_terms_dict):
         self.inverted_idx = all_terms_dict
         self.postingDict = {}
+        self.fileName = 'InvertedIndex'
         self.config = config
+        # {term: [ordered list where appear : (file_id , lineNumber)]}
+        self.map_reduce = MapReduce()
 
     def add_new_doc(self, document):
         """
@@ -18,35 +24,18 @@ class Indexer:
         """
         max_term_list = dict()
         document_dictionary = document.term_doc_dictionary
-        # Go over each term in the doc
         number_of_terms = 0
         for term in document_dictionary.keys():
-            # write pos in disc and import it and work with it
             number_of_terms += 1
-            if term in max_term_list.keys:
+            if term in max_term_list.keys():
                 max_term_list[term] += 1
             else:
                 max_term_list[term] = 1
             try:
-                # Update posting
-                if term.lower() in self.inverted_idx.keys():
-                    if term.upper() in self.postingDict.keys():
-                        self.postingDict[term.lower(
-                        )] = self.postingDict[term.upper()]
-                        del self.postingDict[term.upper()]
-                    if term.lower() not in self.postingDict.keys():
-                        self.postingDict[term.lower()] = []
-                    self.postingDict[term.lower()].append(
-                        (document.tweet_id, document_dictionary[term]))
-                elif term.upper() in self.inverted_idx.keys():
-                    if term.upper() not in self.postingDict.keys():
-                        self.postingDict[term.upper()] = []
-                    self.postingDict[term.upper()].append(
-                        (document.tweet_id, document_dictionary[term]))
-                    #
+                self.map_reduce.write_in(term,(document.tweet_id, document_dictionary[term]))
             except:
                 print('problem with the following key {}'.format(term[0]))
-        max_term = max(max_term_list.keys())
+        # max_term = max(max_term_list.keys())
 
 
 if __name__ == '__main__':
@@ -57,18 +46,24 @@ if __name__ == '__main__':
     i.add_new_doc(parsed_document)
 
 
-"""
-        for term in document_dictionary.keys():
-            try:
-                oldTerm = term
-                #if len(term)!=1:
-                #   term = self.diceStemmers(term)
-                # Update inverted index and posting
-                if term not in self.inverted_idx.keys():
-                    self.inverted_idx[term] = 1
-                    self.postingDict[term] = []
-                else:
-                    self.inverted_idx[term] += 1
-                self.postingDict[term].append((document.tweet_id, document_dictionary[oldTerm]))
-
-"""
+"""       
+# Update posting
+                # run on term.lower of current doc
+                if term.lower() in self.inverted_idx.keys():
+                    # if appear in postingDic as upper but lower change to lower
+                    if term.upper() in self.postingDict.keys():
+                        self.postingDict[term.lower()] = self.postingDict[term.upper()]
+                        del self.postingDict[term.upper()]
+                    # if a new one init as a new list
+                    if term.lower() not in self.postingDict.keys():
+                        self.postingDict[term.lower()] = []
+                        # unit.write(term.lower()) = []
+                    self.postingDict[term.lower()].append((document.tweet_id, document_dictionary[term]))
+                    # {term : }
+                #if seen as upper
+                elif term.upper() in self.inverted_idx.keys():
+                    if term.upper() not in self.postingDict.keys():
+                        self.postingDict[term.upper()] = []
+                    self.postingDict[term.upper()].append((document.tweet_id, document_dictionary[term]))
+                
+                """

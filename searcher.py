@@ -28,7 +28,7 @@ class Searcher:
             term = query[index]
             try:  # an example of checks that you have to do
                 posting_doc = posting[term]  # list of all doc containt term
-                meta_data_dict[index] = (term,len(posting_doc))
+                meta_data_dict[index] = (term,len(posting_doc)) # (term , number of doc with term)
                 for doc_tuple in posting_doc:
                     doc = doc_tuple[0]
                     if doc not in relevant_docs.keys():

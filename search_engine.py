@@ -5,7 +5,6 @@ from parser_module import Parse
 from indexer import Indexer
 from searcher import Searcher
 import utils
-from stemmer import Stemmer
 
 
 def run_engine(corpus_path, output_path, stemming, queries, num_docs_to_retrieve):
@@ -20,15 +19,15 @@ def run_engine(corpus_path, output_path, stemming, queries, num_docs_to_retrieve
     p = Parse(stemming)
     indexer = Indexer(config, p.terms_dic_to_document)
 
-  #  documents_list = r.read_file(file_name='sample3.parquet')
+    #  documents_list = r.read_file(file_name='sample3.parquet')
     # Iterate over every document in the file
     for i in r.filesPath:
         documents_list = r.read_file(i)
         start_time = time.time()
         for idx, document in enumerate(documents_list):
             # parse the document
-            # print(idx)
             parsed_document = p.parse_doc(document)
+            # update the number of doc in system
             number_of_documents += 1
             # index the document data
             indexer.add_new_doc(parsed_document)
