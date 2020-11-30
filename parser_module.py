@@ -74,61 +74,57 @@ class Parse:
             :param text:
             :return:
         """
-        lst =[]
         # if text empty return empty list
         if text == None:
-            return lst
+            return []
         # list of all terms
         term = ''  # a term to add
+        #lst = []
         # run on all character in the text and build terms
+        prev_term = ''  # start with empty
         for character in text:
             # make sure character is not int the forbiden list (divide word)
             if character not in self.operators and character not in self.parentheses and character not in self.separators and character != '\n':
                 term += character  # keep building the term
             if (character == ' ' or character == '/' or character == ":" or character == '"' or character == '\n') and len(term) > 0:
-                lst = self.addToken(lst,term, term_dict)
+                self.addToken(prev_term, term, term_dict)
                 term = ''
         if len(term) > 0:
-            if self.stemming == True and term:
-                term = self.toStem.stem_term(term)
-            lst = self.addToken(lst, term, term_dict)
-        return lst
+            self.addToken(prev_term, term, term_dict)
 
-    def addToEntitys(self, word,term_dict):
+    def addToEntitys(self, word, term_dict):
         if word in self.entitys:
             self.entitys.remove(word)
-            self.add_term_to_dict(word,term_dict)
+            self.add_term_to_dict(word, term_dict)
         else:
             self.entitys.add(word)
 
-    def addToken(self, lst, word, term_dict):
+    def addToken(self, prev_term, word, term_dict):
         # if has a . ? ! remove from word
         if word[-1] == '.' or word[-1] == '?' or word[-1] == '!':
             word = word[:-1]
             # if its the all word return empty list
             if len(word) == 0:
-                return lst
+                return word.lower()
         # if doesnt end with ... and letter
         if word[-1] != '…' and word[0].lower() in self.dict_stop_words.keys():
             # if not a stop word
             if word.lower() not in self.dict_stop_words[word[0].lower()]:
                 # if a Million/dollar and exc..
-                if word.lower() in self.numberList.keys() and len(lst) >= 1:
+                if word.lower() in self.numberList.keys() and prev_term != '':
                     # check if a number
-                    if lst[-1].isnumeric():
-                        lst[-1] += self.numberList[word.lower()]  # add dymbol
-                        self.add_term_numbers_to_dict(lst[-1], term_dict)
+                    if prev_term.isnumeric():
+                        # add dymbol
+                        prev_term += self.numberList[word.lower()]
+                        self.add_term_numbers_to_dict(prev_term, term_dict)
                 # if this and prev are upper creante a new Term
-                if len(lst) > 0 and lst[-1] in self.upper_set and word[0].isupper():
-                    lst[-1] += word
-                    word2 = lst[-1] + word
-                    self.addToEntitys(word2,term_dict)
-                lst.append(word.lower())
+                if prev_term != '' and prev_term in self.upper_set and word[0].isupper():
+                    word2 = prev_term + word
+                    self.addToEntitys(word2, term_dict)
                 self.add_term_to_dict(word, term_dict)
         # if not emoji and not a wiired symbol  or a number or # not end in ... or start with '
         elif ((word.isascii() and word not in self.wird_symbols) or word.isnumeric() or word[0] == '#') and word[-1] != '…' and word[0] != "'":
             # remove ,
-            # 1,000,000,000,0000 ->
             word = word.replace(",", "")
             # if first symbol is nubmer
             if word[0].isdigit():
@@ -143,36 +139,31 @@ class Parse:
                             newW = word
                     # if diffrent after convert
                     if newW != word:
-                        lst.append(newW.lower())
+                        # lst.append(newW.lower())
                         self.add_term_to_dict(word, term_dict)
                 elif len(word) > 7:
                     for i in self.numberList.keys():
                         if i in word:
                             word = word.replace(i, self.numberList[i])
             elif word[0] == "#":
-                lst += self.find_sub_text_indexes(word, term_dict)
-            lst.append(word.lower())
+                self.find_sub_text_indexes(word, term_dict)
             self.add_term_to_dict(word, term_dict)
-        return lst
+        return word.lower()
 
     def convertURL(self, URL, term_dict):
         if URL == None:
-            return []
-        lst = []
+            return
         word = ''
         for i in URL:
             if i not in self.operators and i not in self.parentheses and i not in self.separators:
                 word += i
             if (i == '/' or i == ":" or i == '"') and len(word) >= 1:
                 #lst = self.addToken(lst, word)
-                lst.append(word)
                 self.add_term_to_dict(word, term_dict)
                 word = ''
         #lst = self.addToken(lst, word)
         if len(word) >= 1:
-            lst.append(word)
             self.add_term_to_dict(word, term_dict)
-        return lst
 
     def convertNumber(self, num):
         if num == None:
@@ -239,7 +230,6 @@ class Parse:
     def find_sub_text_indexes(self, hashtag, term_dict):
         i = 0
         word = ''
-        return_list = []
         for letter in hashtag[1:]:
             i += 1
             if (i == len(hashtag) - 1):
@@ -247,23 +237,18 @@ class Parse:
             if letter.isupper():
                 if (not word.isupper() and len(word) > 0) or hashtag[i + 1].islower():
                     if word != '#' and len(word) > 0:
-                        return_list.append(word.lower())
                         self.add_term_to_dict(word, term_dict)
                     word = ''
             elif word.isupper() and len(word) != 1:
-                return_list.append(word.lower())
                 self.add_term_to_dict(word, term_dict)
                 word = ''
             elif letter == '_' and len(word) > 0:
-                return_list.append(word.lower())
                 self.add_term_to_dict(word, term_dict)
                 word = ''
                 letter = ''
             word += letter
         if word != '':
-            return_list.append(word.lower())
             self.add_term_to_dict(word, term_dict)
-        return return_list
 
 
 if __name__ == '__main__':
