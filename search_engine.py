@@ -8,33 +8,32 @@ import utils
 from stemmer import Stemmer
 
 
-def run_engine(corpus_path,output_path,stemming,queries,num_docs_to_retrieve):
+def run_engine(corpus_path, output_path, stemming, queries, num_docs_to_retrieve):
     """
 
     :return:
     """
     number_of_documents = 0
 
-    config = ConfigClass(corpus_path,output_path,stemming)
+    config = ConfigClass(corpus_path, output_path, stemming)
     r = ReadFile(corpus_path=config.get__corpusPath())
     p = Parse(stemming)
-    indexer = Indexer(config,p.terms_dic_to_document)
+    indexer = Indexer(config, p.terms_dic_to_document)
 
   #  documents_list = r.read_file(file_name='sample3.parquet')
     # Iterate over every document in the file
     for i in r.filesPath:
-        documents_list=r.read_file(i)
+        documents_list = r.read_file(i)
         start_time = time.time()
         for idx, document in enumerate(documents_list):
             # parse the document
-            #print(idx)
+            # print(idx)
             parsed_document = p.parse_doc(document)
             number_of_documents += 1
             # index the document data
             indexer.add_new_doc(parsed_document)
         print(time.time() - start_time)
     print('Finished parsing and indexing. Starting to export files')
-
     utils.save_obj(indexer.inverted_idx, "inverted_idx")
     utils.save_obj(indexer.postingDict, "posting")
 
@@ -54,8 +53,9 @@ def search_and_rank_query(query, inverted_index, k):
     return searcher.ranker.retrieve_top_k(ranked_docs, k)
 
 
-def main(corpus_path,output_path,stemming,queries,num_docs_to_retrieve):
-    run_engine(corpus_path,output_path,stemming,queries,num_docs_to_retrieve)
+def main(corpus_path, output_path, stemming, queries, num_docs_to_retrieve):
+    run_engine(corpus_path, output_path, stemming,
+               queries, num_docs_to_retrieve)
     """  query = input("Please enter a query: ")
     k = int(input("Please enter number of docs to retrieve: "))
     inverted_index = load_index()

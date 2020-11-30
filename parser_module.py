@@ -13,7 +13,7 @@ class Parse:
         #self.lower_set = set()
         #self.upper_set = set()
         self.numberList = {"thousand": 'K', "million": 'M',
-                           "billion": 'B', "percentage": '%', "percent": '%',"dollar":'$'}
+                           "billion": 'B', "percentage": '%', "percent": '%', "dollar": '$'}
         self.stop_words = stopwords.words('english')
         # contains of all stop words acording to thiers first letter
         self.dict_stop_words = {
@@ -24,7 +24,8 @@ class Parse:
         for w in self.stop_words:
             self.dict_stop_words[w[0]].append(w)
         # all operator we dont want and all parentheses character and all separators character
-        self.skip_list ={',', ';', ':', ' ','\n','(', ')', '[', ']', '{', '}','*', '+', '-', '/','<', '>', '&', '=', '|', '~', '"'}
+        self.skip_list = {',', ';', ':', ' ', '\n',
+                          '(', ')', '[', ']', '{', '}', '*', '+', '-', '/', '<', '>', '&', '=', '|', '~', '"'}
         # all wired symbols
         self.wird_symbols = {'!', '#', '$', '%', '&', '(', ')', ',', '*', '+', '-', '.', '/', ':', ';', '<', '=', '>', '?',
                              '@', '[', "'\'", ']', '^', '`', '{', '|', '}', '~', '}'}
@@ -83,7 +84,7 @@ class Parse:
                 term += character  # keep building the term
             if (character == ' ' or character == '/' or character == ":" or character == '"' or character == '\n') and len(term) > 0:
                 self.addToken(prev_term, term, term_dict)
-                prev_term=term
+                prev_term = term
                 term = ''
         if len(term) > 0:
             self.addToken(prev_term, term, term_dict)
@@ -95,14 +96,12 @@ class Parse:
         else:
             self.entitys.add(word)
 
-    def checkWordWithApostrophes(self,word):
+    def checkWordWithApostrophes(self, word):
         #head, sep, tail = word.partition("'")
         head, sep, tail = word.partition("’")
         if head.lower() not in self.dict_stop_words[head[0].lower()]:
             return head
         return word
-
-
 
     def addToken(self, prev_term, word, term_dict):
         # if has a . ? ! remove from word
@@ -117,9 +116,9 @@ class Parse:
             if word.lower() not in self.dict_stop_words[word[0].lower()]:
                 # if a Million/dollar and exc..
                 if "’" in word:
-                    newWord=self.checkWordWithApostrophes(word)
-                    self.add_term_to_dict(newWord,term_dict)
-                    word=word.replace("’","")
+                    newWord = self.checkWordWithApostrophes(word)
+                    self.add_term_to_dict(newWord, term_dict)
+                    word = word.replace("’", "")
                 if word.lower() in self.numberList.keys() and prev_term != '':
                     # check if a number
                     if prev_term.isnumeric():
@@ -128,7 +127,7 @@ class Parse:
                         self.add_term_numbers_to_dict(prev_term, term_dict)
                 # if this and prev are upper creante a new Term
                 if prev_term != '' and prev_term[0].isupper() and prev_term.upper() in self.terms_dic_to_document.keys() and word[0].isupper():
-                    word2 = prev_term +" "+ word
+                    word2 = prev_term + " " + word
                     self.addToEntitys(word2, term_dict)
                 self.add_term_to_dict(word, term_dict)
         # if not emoji and not a wiired symbol  or a number or # not end in ... or start with '
@@ -187,7 +186,7 @@ class Parse:
 
     def add_term_numbers_to_dict(self, term, term_dict):
         if term.lower() not in self.terms_dic_to_document.keys() and term.upper() not in self.terms_dic_to_document.keys():
-            #self.upper_set.add(term.upper())
+            # self.upper_set.add(term.upper())
             term_dict[term.upper()] = 1
             self.terms_dic_to_document[term.upper()] = 1
         elif term.upper() in self.terms_dic_to_document.keys():
@@ -198,10 +197,14 @@ class Parse:
             self.terms_dic_to_document[term.upper()] += 1
 
     def add_term_to_dict(self, term, term_dict):
+        # if word not empty
         if len(term) > 0:
+            # if we want to steam steam
             if self.stemming:
                 term = self.toStem(term)
+            # if a new word (didn't see it before) in all doc
             if term.lower() not in self.terms_dic_to_document.keys() and term.upper() not in self.terms_dic_to_document.keys():
+                #
                 if (term[0].isupper() and (term[1:].islower() or term[1:].isupper()) and term.isalpha()) or term[-1].upper() in self.numberList.values() or term in self.entitys:
                     if term in self.entitys:
                         term_dict[term.upper()] = 2
@@ -210,15 +213,19 @@ class Parse:
                         term_dict[term.upper()] = 1
                         self.terms_dic_to_document[term.upper()] = 1
                 else:
-                    #self.lower_set.add(term)
+                    # self.lower_set.add(term)
                     term_dict[term.lower()] = 1
                     self.terms_dic_to_document[term.lower()] = 1
+            # if appear as lower in all doc
             elif term.lower() in self.terms_dic_to_document.keys():
+                # if first time in doc crate new else ++
                 if term not in term_dict.keys():
                     term_dict[term.lower()] = 1
                 else:
                     term_dict[term.lower()] += 1
+                # inc the lower count
                 self.terms_dic_to_document[term.lower()] += 1
+            # if appear as upper in all doc
             elif term.upper() in self.terms_dic_to_document.keys():
                 if term[0].isupper() or term[-1].upper() in self.numberList.values():
                     if term.upper() not in term_dict.keys():
@@ -227,8 +234,8 @@ class Parse:
                         term_dict[term.upper()] += 1
                     self.terms_dic_to_document[term.upper()] += 1
                 else:
-                    #self.upper_set.remove(term.upper())
-                    #self.lower_set.add(term.lower())
+                    # self.upper_set.remove(term.upper())
+                    # self.lower_set.add(term.lower())
                     self.terms_dic_to_document[term.lower()] = self.terms_dic_to_document[term.upper()]+1
                     del self.terms_dic_to_document[term.upper()]
                     if term.upper() in term_dict.keys():
