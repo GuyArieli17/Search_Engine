@@ -31,8 +31,7 @@ class Parse:
         # all separators character
         separators = {',', ';', ':', ' '}
 
-        self.skip_list = operators.union(
-            parentheses).union(separators).union('\n')
+        self.skip_list = operators.union(parentheses).union(separators)
         # all wired symbols
         self.wird_symbols = {'!', '#', '$', '%', '&', '(', ')', ',', '*', '+', '-', '.', '/', ':', ';', '<', '=', '>', '?',
                              '@', '[', "'\'", ']', '^', '`', '{', '|', '}', '~', '}'}
@@ -87,7 +86,7 @@ class Parse:
         prev_term = ''  # start with empty
         for character in text:
             # make sure character is not int the forbiden list (divide word)
-            if character not in self.skip_list:
+            if character not in self.skip_list and character != '\n':
                 term += character  # keep building the term
             if (character == ' ' or character == '/' or character == ":" or character == '"' or character == '\n') and len(term) > 0:
                 self.addToken(prev_term, term, term_dict)
@@ -158,7 +157,7 @@ class Parse:
             return
         word = ''
         for i in URL:
-            if i not in self.operators and i not in self.parentheses and i not in self.separators:
+            if i not in self.skip_list:
                 word += i
             if (i == '/' or i == ":" or i == '"') and len(word) >= 1:
                 #lst = self.addToken(lst, word)
@@ -195,7 +194,7 @@ class Parse:
 
         if len(term) > 0:
             if self.stemming:
-                term = self.toStem(term)
+                term = self.toStem.stem_term(term)
             if term.lower() not in self.lower_set and term.upper() not in self.upper_set:
                 if (term[0].isupper() and (term[1:].islower() or term[1:].isupper()) and term.isalpha()) or term[-1].upper() in self.numberList.values():
                     self.upper_set.add(term.upper())
