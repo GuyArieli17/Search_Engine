@@ -9,7 +9,6 @@ class Parse:
         self.stemming = stemming
         self.toStem = Stemmer()
         self.terms_dic_to_document = {}
-        self.entitys = set()
         #self.lower_set = set()
         #self.upper_set = set()
         self.numberList = {"thousand": 'K', "million": 'M',
@@ -89,16 +88,17 @@ class Parse:
         if len(term) > 0:
             self.addToken(prev_term, term, term_dict)
 
-    def addToEntitys(self, word, term_dict):
-        if word in self.entitys:
-            self.add_term_to_dict(word, term_dict)
-            self.entitys.remove(word)
+    def addToEntitys(self, term, term_dict):
+        if term not in term_dict.keys():
+            term_dict[term.upper()] = 1
         else:
-            self.entitys.add(word)
+            term_dict[term.upper()] += 1
 
     def checkWordWithApostrophes(self, word):
-        #head, sep, tail = word.partition("'")
-        head, sep, tail = word.partition("’")
+        if "'" in word:
+            head, sep, tail = word.partition("'")
+        else:
+            head, sep, tail = word.partition("’")
         if head.lower() not in self.dict_stop_words[head[0].lower()]:
             return head
         return word
@@ -115,9 +115,10 @@ class Parse:
             # if not a stop word
             if word.lower() not in self.dict_stop_words[word[0].lower()]:
                 # if a Million/dollar and exc..
-                if "’" in word:
+                if "’" in word or "'" in word:
                     newWord = self.checkWordWithApostrophes(word)
                     self.add_term_to_dict(newWord, term_dict)
+                    word = word.replace("'", "")
                     word = word.replace("’", "")
                 if word.lower() in self.numberList.keys() and prev_term != '':
                     # check if a number
@@ -204,14 +205,14 @@ class Parse:
                 term = self.toStem(term)
             # if a new word (didn't see it before) in all doc
             if term.lower() not in self.terms_dic_to_document.keys() and term.upper() not in self.terms_dic_to_document.keys():
-                #
-                if (term[0].isupper() and (term[1:].islower() or term[1:].isupper()) and term.isalpha()) or term[-1].upper() in self.numberList.values() or term in self.entitys:
-                    if term in self.entitys:
-                        term_dict[term.upper()] = 2
-                        self.terms_dic_to_document[term.upper()] = 2
-                    else:
+                if (term[0].isupper() and (term[1:].islower() or term[1:].isupper()) and term.isalpha()) or term[-1].upper() in self.numberList.values():
+                    if (term[0].isupper() and (term[1:].islower() or term[1:].isupper()) and term.isalpha()) or term[-1].upper() in self.numberList.values():
                         term_dict[term.upper()] = 1
                         self.terms_dic_to_document[term.upper()] = 1
+                    else:
+                        # self.lower_set.add(term)
+                        term_dict[term.lower()] = 1
+                        self.terms_dic_to_document[term.lower()] = 1
                 else:
                     # self.lower_set.add(term)
                     term_dict[term.lower()] = 1
