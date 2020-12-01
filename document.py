@@ -1,5 +1,5 @@
-
 class Document:
+
     def __init__(self, tweet_id, tweet_date=None, full_text=None, url=None, indices=None, retweet_text=None, retweet_urls=None, retweet_indices=None,
                  quoted_text=None, quote_urls=None, quoted_indices=None, retweet_quoted_text=None, retweet_quoted_urls=None, retweet_quoted_indice=None,
                  term_doc_dictionary=None):
