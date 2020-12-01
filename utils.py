@@ -1,7 +1,6 @@
 import pickle
 import os.path
 
-
 def save_obj(obj, name):
     """
     This function save an object as a pickle.
@@ -11,7 +10,6 @@ def save_obj(obj, name):
     """
     with open(name + '.pkl', 'wb') as f:
         pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
-
 
 def load_obj(name):
     """
