@@ -13,9 +13,10 @@ class Indexer:
         self.fileName = 'InvertedIndex'
         self.config = config
         # {term: [ordered list where appear : (file_id , lineNumber)]}
-        avg_ram = (psutil.virtual_memory().available // 7)
+        self.thread_pool_size = 5
+        avg_ram = (psutil.virtual_memory().available // 7)//self.thread_pool_size
         self.avg_length =(avg_ram // sys.getsizeof((int(), str()))) // (8/10)
-        self.map_reduce = MapReduce(self.avg_length)
+        self.map_reduce = MapReduce(self.avg_length,self.thread_pool_size)
         self.tmp_pos = {}
         self.num_in_pos_tmp = 0
 
@@ -38,7 +39,6 @@ class Indexer:
                 max_term_list[term] = 1
             try:
                 if self.num_in_pos_tmp >= self.avg_length:
-                    print('Write in file')
                     self.map_reduce.write_dict(self.tmp_pos)
                     self.tmp_pos.clear()
                     self.num_in_pos_tmp = 0
