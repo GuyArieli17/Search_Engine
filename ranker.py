@@ -1,6 +1,6 @@
 import math
 import utils
-
+from MapReduce import MapReduce
 class Ranker:
 
     def __init__(self):
@@ -102,7 +102,7 @@ class Ranker:
             for doc_id in top_relevant_docs.keys():
                 if doc_id !='META-DATA':
                     if index in top_relevant_docs[doc_id][2]:
-                        document_dictionary = map_reduce.read_from(('Document',doc_id))
+                        document_dictionary = MapReduce.read_from(('Document',doc_id))
                         #sum = 0
                         for doc_term, freq in document_dictionary.items():
                             #
