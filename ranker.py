@@ -7,7 +7,6 @@ class Ranker:
         #lalal
         pass
 
-
     @staticmethod
     def get_relvant_docs(parse_query, posting):
         """
@@ -55,9 +54,13 @@ class Ranker:
         number_of_dcoument_in_compos = len(relevant_doc)
         # get the Meta Data from relvant_doc
         meta_data_dict = relevant_doc["META-DATA"]
+        if len(meta_data_dict)==0:
+            return {}
         # run on all relevant_doc
         for document_id, info_list in relevant_doc.items():
             # start with score 0
+            if len(info_list)<2:
+                continue
             doc_score = 0
             # get all doc information
             doc_tuple = info_list[0]
@@ -74,8 +77,8 @@ class Ranker:
             info_list.insert(0, doc_score) # [score,doc_tuple, {index}]
         # sort by the score
         if number_of_doc == 'All':
-            return sorted(relevant_doc.items(), key=lambda item: item[0], reverse=True)
-        return (sorted(relevant_doc.items(), key=lambda item: item[0], reverse=True))[:number_of_doc]
+            return dict(sorted(relevant_doc.items(), key=lambda item: item[0], reverse=True))
+        return dict(sorted(relevant_doc.items(), key=lambda item: item[0], reverse=True)[:number_of_doc+1])
     
     @staticmethod
     def create_c_of_doc(top_relevant_docs, parse_qurey):
@@ -85,29 +88,30 @@ class Ranker:
         # c[term,term2] = sum[k](term1 in doc k * term2 in doc k)
         #  = > {}
         c_matrix = {} # {term: {'other term' : value}}
-        set = {}
+        #set = {}
         for index in range(len(parse_qurey)):
             term = parse_qurey[index]
             # check if already exist
-            if term not in c_matrix.keys():
-                c_matrix[term] = {}
+            #if term not in c_matrix.keys():
+            #    c_matrix[term] = {}
             # build {term: {}}
             if term not in c_matrix.keys():
                 c_matrix[term] = {}
             # run on all dox in map reduce
             term_sim_dic = {} #{other_term: value - > sum until now}
             for doc_id in top_relevant_docs.keys():
-                if index in top_relevant_docs[doc_id][2]:
-                    document_dictionary = map_reduce.read_from(('Document',doc_id))
-                    sum = 0
-                    for doc_term, freq in document_dictionary.items():
-                        #
-                        # if term == doc_term:
-                        #     continue
-                        # create new key
-                        if doc_term not in term_sim_dic.keys():
-                            term_sim_dic[doc_term] = 0
-                        term_sim_dic[doc_term] += freq * document_dictionary[term]
+                if doc_id !='META-DATA':
+                    if index in top_relevant_docs[doc_id][2]:
+                        document_dictionary = map_reduce.read_from(('Document',doc_id))
+                        #sum = 0
+                        for doc_term, freq in document_dictionary.items():
+                            #
+                            # if term == doc_term:
+                            #     continue
+                            # create new key
+                            if doc_term not in term_sim_dic.keys():
+                                term_sim_dic[doc_term] = 0
+                            term_sim_dic[doc_term] += freq * document_dictionary[term]
             c_matrix[term] = term_sim_dic
         return c_matrix
 
@@ -161,7 +165,7 @@ class Ranker:
         insert_dic_by_term.clear()
 
     @staticmethod
-    def rank_relevant_doc(relevant_doc,parse_query,posting):
+    def rank_relevant_doc(relevant_doc,parse_query,posting,num_docs_to_retrieve=100):
         """
         This function provides rank for each relevant document and sorts them by their scores.
         The current score considers solely the number of terms shared by the tweet (full_text) and query.
@@ -169,7 +173,7 @@ class Ranker:
         :return: sorted list of documents by score
         """
         # get the best n docs for qurey (simple)
-        top_relvant_docs = Ranker.simple_rank_doc_top_n(relevant_doc)
+        top_relvant_docs = Ranker.simple_rank_doc_top_n(relevant_doc,num_docs_to_retrieve)
         #create c basic matrix to work with
         c_matrix = Ranker.create_c_of_doc(top_relvant_docs,parse_query)
         association_matrix = Ranker.create_association_matrix(c_matrix)
@@ -185,4 +189,6 @@ class Ranker:
         :param k: Number of top document to return
         :return: list of relevant document
         """
+        if len(sorted_relevant_doc)==0:
+            return sorted_relevant_doc
         return sorted_relevant_doc[:k]
