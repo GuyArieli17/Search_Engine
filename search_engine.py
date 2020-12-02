@@ -41,7 +41,7 @@ def load_index():
     inverted_index = utils.load_obj("inverted_idx")
     return inverted_index
 
-def search_and_rank_query(query, inverted_index, k):
+def search_and_rank_query(query, inverted_index,num_docs_to_retrieve):
     p = Parse()
     dictFromQuery = {}
     p.tokenSplit(query, dictFromQuery)
@@ -49,8 +49,8 @@ def search_and_rank_query(query, inverted_index, k):
     searcher = Searcher(inverted_index)
     posting = utils.load_obj("posting")
     relevant_docs = searcher.relevant_docs_from_posting(query_as_list,posting)
-    ranked_docs = searcher.ranker.rank_relevant_doc(relevant_docs,query_as_list,posting)
-    return searcher.ranker.retrieve_top_k(ranked_docs, k)
+    ranked_docs = searcher.ranker.rank_relevant_doc(relevant_docs,query_as_list,posting,num_docs_to_retrieve)
+    return searcher.ranker.retrieve_top_k(ranked_docs,num_docs_to_retrieve)
 
 def main(corpus_path, output_path, stemming, queries, num_docs_to_retrieve):
     run_engine(corpus_path, output_path, stemming,queries, num_docs_to_retrieve)
