@@ -38,17 +38,15 @@ class Ranker:
     def weight_of_term(term_frequence, number_of_dcoument_in_compos, number_of_document_with_term, number_of_term_in_document=0, avg_doc_length=0):
         _k = 1.2
         _b = 0.75
-        idf_term = math.log2(number_of_dcoument_in_compos /
-                             number_of_document_with_term)
+        idf_term = math.log2(number_of_dcoument_in_compos/number_of_document_with_term)
         document_punishment = 1
         # document_punishment = 1 - self._b + self._b * \
         #     (number_of_term_in_document/avg_doc_length)
-        divider = (term_frequence * (_k + 1)) / \
-            (term_frequence + _k * document_punishment)
+        divider = term_frequence*(number_of_term_in_document * (_k + 1))/(number_of_term_in_document + _k * document_punishment)
         return idf_term * divider
 
     @staticmethod
-    def simple_rank_doc_top_n(relevant_doc, number_of_doc=100):
+    def simple_rank_doc_top_n(relevant_doc, number_of_doc=100,dictFromQuery={}):
         # qurey_parse = relevant_doc["Query_info-"]
         # get number of document in relevent docs
         number_of_dcoument_in_compos = len(relevant_doc)
@@ -65,12 +63,12 @@ class Ranker:
             # get all doc information
             doc_tuple = info_list[0]
             # get from doc_tuple the number of time term appear
-            number_of_term_in_document = doc_tuple[0]
+            number_of_term_in_document = doc_tuple[1]
             # get how many time appear from the doc_tuple
-            term_frequence = 0
             intersection_terms = info_list[1]
             # run on all similar terms
             for term_index in intersection_terms:
+                term_frequence = dictFromQuery[meta_data_dict[term_index][0]]
                 number_of_document_with_term = meta_data_dict[term_index][1]
                 doc_score += Ranker.weight_of_term(term_frequence, number_of_dcoument_in_compos,
                                                    number_of_document_with_term, number_of_term_in_document)
@@ -81,9 +79,8 @@ class Ranker:
         return dict(sorted(relevant_doc.items(), key=lambda item: item[0], reverse=True)[:number_of_doc+1])
     
     @staticmethod
-    def create_c_of_doc(top_relevant_docs, parse_qurey):
+    def create_c_of_doc(top_relevant_docs, parse_qurey,posting):
         # load map reduce from file
-        map_reduce = utils.load_obj("posting")
         # relavent doc : # {doc_id : [score,doc_tuple, {index}]}
         # c[term,term2] = sum[k](term1 in doc k * term2 in doc k)
         #  = > {}
@@ -134,19 +131,20 @@ class Ranker:
         return association_matrix
 
     @staticmethod
-    def expand_qurey(parse_qurey, association_matrix):
+    def expand_qurey(DictFromQuery, association_matrix):
         # from wich associatio we accept
         MIN_REQUIREDMENT = 0.6
         # the word we will insert
         insert_dic_by_term = {}  # {index: [word1,word2]}
         # run on all terms in qurey
-        for index in range(len(parse_qurey)):
+        #for index in range(len(parse_qurey)):
+        for term,freq in DictFromQuery.items():
             # the term from query
-            term = parse_qurey[index]
+            #term = parse_qurey[index]
             # create a list to expand
             term_associated_term = []
             # save this list
-            insert_dic_by_term[index] = term_associated_term
+            insert_dic_by_term[term] = term_associated_term
             # take the top association word with term
             for column in association_matrix[term]:
                 for inner_term, associated_value in column.items():
@@ -157,15 +155,17 @@ class Ranker:
         # how much the indexies changed
         prev_added = 1
         # run and add all the new words
-        for index in insert_dic_by_term.keys():
-            list_values = insert_dic_by_term[index]
-            for value in list_values:
-                parse_qurey.insert(index + prev_added, value)
-                prev_added += 1
+        #for index in insert_dic_by_term.keys():
+        #    list_values = insert_dic_by_term[index]
+        #    for value in list_values:
+        #       parse_qurey.insert(index + prev_added, value)
+        #        prev_added += 1
+        for term,added_word in insert_dic_by_term.items():
+            DictFromQuery[added_word]=DictFromQuery[term]
         insert_dic_by_term.clear()
 
     @staticmethod
-    def rank_relevant_doc(relevant_doc,parse_query,posting,num_docs_to_retrieve=100):
+    def rank_relevant_doc(relevant_doc,dictFromQuery,posting,num_docs_to_retrieve=100):
         """
         This function provides rank for each relevant document and sorts them by their scores.
         The current score considers solely the number of terms shared by the tweet (full_text) and query.
@@ -173,13 +173,13 @@ class Ranker:
         :return: sorted list of documents by score
         """
         # get the best n docs for qurey (simple)
-        top_relvant_docs = Ranker.simple_rank_doc_top_n(relevant_doc,num_docs_to_retrieve)
+        top_relvant_docs = Ranker.simple_rank_doc_top_n(relevant_doc,num_docs_to_retrieve,dictFromQuery)
         #create c basic matrix to work with
-        c_matrix = Ranker.create_c_of_doc(top_relvant_docs,parse_query)
+        c_matrix = Ranker.create_c_of_doc(top_relvant_docs,[*dictFromQuery],posting)
         association_matrix = Ranker.create_association_matrix(c_matrix)
         c_matrix.clear()
-        Ranker.expand_qurey(parse_query,association_matrix)
-        return Ranker.simple_rank_doc_top_n(Ranker.get_relvant_docs(parse_query,posting),'All')
+        Ranker.expand_qurey(dictFromQuery,association_matrix)
+        return Ranker.simple_rank_doc_top_n(Ranker.get_relvant_docs([*dictFromQuery],posting),'All',dictFromQuery)
 
     @staticmethod
     def retrieve_top_k(sorted_relevant_doc, k=1):
