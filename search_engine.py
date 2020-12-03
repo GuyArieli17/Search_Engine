@@ -7,6 +7,7 @@ from searcher import Searcher
 import utils
 import xlwt
 from xlwt import Workbook
+from MapReduce import MapReduce
 
 
 def run_engine(corpus_path, output_path, stemming, queries, num_docs_to_retrieve):
@@ -35,8 +36,15 @@ def run_engine(corpus_path, output_path, stemming, queries, num_docs_to_retrieve
         print(time.time() - start_time)
     print('Finished parsing and indexing. Starting to export files')
 
-    #utils.save_obj(indexer.inverted_idx, "inverted_idx")
+    utils.save_obj(indexer.inverted_idx, "inverted_idx")
     #utils.save_obj(indexer.map_reduce, "posting")
+    if len(indexer.tmp_pos)>0:
+        for k,v in indexer.tmp_pos.items():
+            indexer.map_reduce.write_in(k,v)
+        #indexer.map_reduce.write_dict_func_async(indexer.tmp_pos)
+        indexer.tmp_pos.clear()
+        indexer.num_in_pos_tmp=0
+    indexer.map_reduce.save_map_reduce()
 
 def load_index():
     print('Load inverted index')
@@ -49,9 +57,13 @@ def search_and_rank_query(query, inverted_index,num_docs_to_retrieve):
     p.tokenSplit(query, dictFromQuery)
     query_as_list = [*dictFromQuery]
     searcher = Searcher(inverted_index)
-    posting = utils.load_obj("posting")
+    #posting = utils.load_obj("posting")
+    map_reduce=MapReduce.import_map_reduce('MapReduceData/')
+    posting={}
+    for term in query_as_list:
+        posting[term]=map_reduce.read_from_func_async(term)
     relevant_docs = searcher.relevant_docs_from_posting(query_as_list,posting)
-    ranked_docs = searcher.ranker.rank_relevant_doc(relevant_docs,query_as_list,posting,num_docs_to_retrieve)
+    ranked_docs = searcher.ranker.rank_relevant_doc(relevant_docs,dictFromQuery,posting,num_docs_to_retrieve)
     return searcher.ranker.retrieve_top_k(ranked_docs,num_docs_to_retrieve)
 
 def main(corpus_path, output_path, stemming, queries, num_docs_to_retrieve):
