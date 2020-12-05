@@ -39,14 +39,15 @@ class Ranker:
         _k = 1.2
         _b = 0.75
         idf_term = math.log2(number_of_dcoument_in_compos/number_of_document_with_term)
-        document_punishment = 1
+        document_punishment = 1.0
         # document_punishment = 1 - self._b + self._b * \
         #     (number_of_term_in_document/avg_doc_length)
-        divider = term_frequence*(number_of_term_in_document * (_k + 1))/(number_of_term_in_document + _k * document_punishment)
+        num=float(number_of_term_in_document)
+        divider = term_frequence*(num * (_k + 1.0))/(num + _k * document_punishment)
         return idf_term * divider
 
     @staticmethod
-    def simple_rank_doc_top_n(relevant_doc, number_of_doc=100,dictFromQuery={}):
+    def simple_rank_doc_top_n(relevant_doc, number_of_doc=2000,dictFromQuery={}):
         # qurey_parse = relevant_doc["Query_info-"]
         # get number of document in relevent docs
         number_of_dcoument_in_compos = len(relevant_doc)
@@ -65,7 +66,10 @@ class Ranker:
             # get all doc information
             freq = info_list[0]
             # get from doc_tuple the number of time term appear
-            number_of_term_in_document = freq
+            if isinstance(freq,tuple):
+                number_of_term_in_document = freq[1]
+            else:
+                number_of_term_in_document=freq
             # get how many time appear from the doc_tuple
             intersection_terms = info_list[1]
             # run on all similar terms
@@ -76,9 +80,13 @@ class Ranker:
                                                    number_of_document_with_term, number_of_term_in_document)
             info_list.insert(0, doc_score) # [score,doc_tuple, {index}]
         # sort by the score
-        if number_of_doc == 'All':
-            return dict(sorted(relevant_doc.items(), key=lambda item: item[0], reverse=True))
-        return dict(sorted(relevant_doc.items(), key=lambda item: item[0], reverse=True)[:number_of_doc+1])
+        #if number_of_doc == 'All': {'metadat:[],'docid:[rank,()]'}
+           # return sorted(relevant_doc.items(), key=lambda item: item[1][0], reverse=True)
+        lst = relevant_doc.pop('META-DATA')
+        result=sorted(relevant_doc.items(), key=lambda item: item[1][0], reverse=True)[:number_of_doc]
+        result+=[('META-DATA',lst)]
+        relevant_doc['META-DATA']=lst
+        return result
     
     @staticmethod
     def create_c_of_doc(top_relevant_docs, dictFromQuery,posting):
@@ -92,27 +100,28 @@ class Ranker:
         for doc_id in top_relevant_docs.keys():
             if doc_id != 'META-DATA':
                 doc_term_freq_dict = map_reduce.read_from_func_async(('Document', doc_id))[0]
-                for queryIndex in top_relevant_docs[doc_id][2]:
-                    termQuery=queryAsList[queryIndex]
-                    termFreq=doc_term_freq_dict[termQuery]
-                    if termQuery not in c_matrix.keys():
-                        c_matrix[termQuery]={}
-                    for term_doc,term_doc_freq in doc_term_freq_dict.items():
-                        if term_doc==termQuery:
-                            continue
-                        else:
-                            c_matrix[termQuery][term_doc]=termFreq*term_doc_freq
+                for term_doc1,term_doc_freq1 in doc_term_freq_dict.items():
+                #for queryIndex in top_relevant_docs[doc_id][2]:
+                    if term_doc1 not in c_matrix.keys():
+                        c_matrix[term_doc1]={}
+                    for term_doc2,term_doc_freq2 in doc_term_freq_dict.items():
+                        if term_doc1 in dictFromQuery.keys() or term_doc1==term_doc2:
+                            if term_doc2 not in c_matrix[term_doc1]:
+                                c_matrix[term_doc1][term_doc2] = 0
+                            c_matrix[term_doc1][term_doc2] += term_doc_freq1 * term_doc_freq2 #Cii,Cjj,Cij
         return c_matrix
 
 
     @staticmethod
-    def create_association_matrix(c_matrix):
+    def create_association_matrix(c_matrix,dictFromQuery):
 
         # c_matrix will be a dic of dic  {term: totalSum}
         association_matrix = {}
         # dict build as first serch of i and then cearch j (dict inside a dict)
-        for term in c_matrix.keys():
+        for term in dictFromQuery.keys():
             # get all dict of all values association with terms
+            if term not in c_matrix.keys():
+                continue
             association_terms_dict = c_matrix[term]
             # create a dic of all associate terms
             column_dict = {}
@@ -149,17 +158,9 @@ class Ranker:
             column=association_matrix[term]
             for inner_term, associated_value in column.items():
                 #  column.item = { term : associated value}
-                if associated_value >= MIN_REQUIREDMENT:
+                if associated_value >= MIN_REQUIREDMENT and inner_term != term:
                     term_associated_term.append(inner_term)
             # may be add a sort so added word will be sorted
-        # how much the indexies changed
-        prev_added = 1
-        # run and add all the new words
-        #for index in insert_dic_by_term.keys():
-        #    list_values = insert_dic_by_term[index]
-        #    for value in list_values:
-        #       parse_qurey.insert(index + prev_added, value)
-        #        prev_added += 1
         for term,list_added_word in insert_dic_by_term.items():
             for inner_word in list_added_word:
                 DictFromQuery[inner_word]=DictFromQuery[term]
@@ -176,11 +177,11 @@ class Ranker:
         # get the best n docs for qurey (simple)
         top_relvant_docs = Ranker.simple_rank_doc_top_n(relevant_doc,num_docs_to_retrieve,dictFromQuery)
         #create c basic matrix to work with
-        c_matrix = Ranker.create_c_of_doc(top_relvant_docs,dictFromQuery,posting)
-        association_matrix = Ranker.create_association_matrix(c_matrix)
+        c_matrix = Ranker.create_c_of_doc(dict(top_relvant_docs),dictFromQuery,posting)
+        association_matrix = Ranker.create_association_matrix(c_matrix,dictFromQuery)
         c_matrix.clear()
         Ranker.expand_qurey(dictFromQuery,association_matrix)
-        return Ranker.simple_rank_doc_top_n(Ranker.get_relvant_docs([*dictFromQuery],posting),'All',dictFromQuery)
+        return Ranker.simple_rank_doc_top_n(Ranker.get_relvant_docs([*dictFromQuery],posting),num_docs_to_retrieve,dictFromQuery)
 
     @staticmethod
     def retrieve_top_k(sorted_relevant_doc, k=1):
