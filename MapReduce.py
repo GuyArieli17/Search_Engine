@@ -119,7 +119,7 @@ class MapReduce:
         return future.result()
 
     def read_from_func(self, term):
-        return asyncio.run(self.read_from_func_async(term))
+        return self.read_from_func_async(term)
 
     def read_from_func_async(self,term): #async
         data_list = []
