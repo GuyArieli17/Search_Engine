@@ -99,7 +99,10 @@ class Ranker:
         c_matrix = {} # {term: {'other term' : value}}
         for doc_id in top_relevant_docs.keys():
             if doc_id != 'META-DATA':
-                doc_term_freq_dict = map_reduce.read_from_func_async(('Document', doc_id))[0]
+                doc_term_freq_dict = map_reduce.read_from_func_async(('Document', doc_id))
+                if len(doc_term_freq_dict)==0:
+                    continue
+                doc_term_freq_dict=doc_term_freq_dict[0]
                 for term_doc1,term_doc_freq1 in doc_term_freq_dict.items():
                 #for queryIndex in top_relevant_docs[doc_id][2]:
                     if term_doc1 not in c_matrix.keys():
