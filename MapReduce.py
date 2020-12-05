@@ -55,6 +55,8 @@ class MapReduce:
 
     def write_in(self,term, data_list):
         #  file name = (dic location) / the possible file to write in
+        if isinstance(term,list):
+            print("x")
         file_name = self.path + str(self.file_index)
         # only one process can update
         self.update_lock.acquire()
@@ -123,7 +125,7 @@ class MapReduce:
 
     def read_from_func_async(self,term): #async
         data_list = []
-        # {(term: [])}
+        # {(term: [])} #term=document,docID
         #await self.process_semaphore.acquire()
         try:
             term_meta_data = self.meta_data[term]
@@ -148,7 +150,10 @@ class MapReduce:
             # build list as organize
             for i in range(len(term_meta_data)):
                 current_file_index, current_line_number, _ = term_meta_data[i]
-                data_list+=organize_dic[(current_file_index, current_line_number)]
+                if isinstance(organize_dic[(current_file_index, current_line_number)],dict):
+                    data_list += (organize_dic[(current_file_index, current_line_number)],0)
+                else:
+                    data_list+=organize_dic[(current_file_index, current_line_number)]
         finally:
             #self.process_semaphore.release()
             return data_list
