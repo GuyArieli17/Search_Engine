@@ -31,7 +31,7 @@ class Searcher:
                 for doc_tuple in posting_doc:
                     doc = doc_tuple[0]
                     if doc not in relevant_docs.keys():
-                        relevant_docs[doc] = [doc_tuple, {index}]
+                        relevant_docs[doc] = [doc_tuple[1], {index}] #doc_tuple[1]=freq
                     else:
                         relevant_docs[doc][1].add(index)
             except:
