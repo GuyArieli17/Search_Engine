@@ -68,24 +68,27 @@ def search_and_rank_query(query, inverted_index,num_docs_to_retrieve):
 
 def main(corpus_path, output_path, stemming, queries, num_docs_to_retrieve):
     wb = Workbook()
+    counter = 1
+    counterQuery = 0
     # add_sheet is used to create sheet.
     sheet1 = wb.add_sheet('Sheet 1')
     sheet1.write(0, 1, 'Query_number')
     sheet1.write(0, 2, 'Tweet_id')
     sheet1.write(0, 3, 'Rank')
-    counter=0
-    counterQuery=0
     run_engine(corpus_path, output_path, stemming,queries, num_docs_to_retrieve)
     # query = input("Please enter a query: ")
     # k = int(input("Please enter number of docs to retrieve: "))
     inverted_index = load_index()
     for query in queries:
-        for doc_tuple in search_and_rank_query(query, inverted_index,num_docs_to_retrieve):
-            sheet1.write(0,counter+1,counter)
-            sheet1.write(1,counter+1,counterQuery)
-            sheet1.write(2,counter+1,doc_tuple[0])
-            sheet1.write(1,counter+1,doc_tuple[1])
-            counter+=1
+        d=search_and_rank_query(query, inverted_index, num_docs_to_retrieve)
+        print(d)
+        for doc_tuple in d:
+            if doc_tuple[0]!='META-DATA':
+                sheet1.write(counter,0,counter)
+                sheet1.write(counter,1,counterQuery)
+                sheet1.write(counter,2,doc_tuple[0])
+                sheet1.write(counter,3,doc_tuple[1][0])
+                counter+=1
         counterQuery+=1
     wb.save('results.xls')
 
