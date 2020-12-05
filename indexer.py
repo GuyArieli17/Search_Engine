@@ -19,8 +19,17 @@ class Indexer:
         self.num_in_pos_tmp = 0
         self.Entitys = {}
 
-
-
+    """def create_c_matrix_dict(self,document_dictionary):
+        c_matrix_dict={}
+        for term1,freq1 in document_dictionary.items():
+            if term1 not in c_matrix_dict.keys():
+                term_sum={}
+                for term2, freq2 in document_dictionary.items():
+                    if term1!=term2:
+                        term_sum[term1]+=freq1*freq2
+                c_matrix_dict[term1]=term_sum
+        return c_matrix_dict
+    """
 
     def addEntitysToPosting(self,term,tweet_id,quantity):
         if term.upper() not in self.Entitys.keys() and term.upper() not in self.tmp_pos.keys():
@@ -45,7 +54,7 @@ class Indexer:
         :param document: a document need to be indexed.
         :return: -
         """
-        document_dictionary = document.term_doc_dictionary
+        document_dictionary = document.term_doc_dictionary #{term:freq,term:freq}
         for term in document_dictionary.keys():
             try:
                 if term[0].isupper() and " " in term:
@@ -58,12 +67,12 @@ class Indexer:
                 if term.lower() not in self.tmp_pos.keys():
                     self.tmp_pos[term.lower()] = []
                 self.tmp_pos[term.lower()].append((document.tweet_id, document_dictionary[term]))
-                max_freq = max([document_dictionary.values()])
-                self.tmp_pos[('Document',document.tweet_id)] = document_dictionary
+                #max_freq = max([document_dictionary.values()])
                 self.num_in_pos_tmp += 1
             except:
                 print('problem with the following key {}'.format(term[0]))
-
+        max_freq = max([document_dictionary.values()])
+        self.tmp_pos[('Document', document.tweet_id)] = document_dictionary
 
 if __name__ == '__main__':
     p = Parse(True)
