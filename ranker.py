@@ -57,6 +57,8 @@ class Ranker:
         # run on all relevant_doc
         for document_id, info_list in relevant_doc.items():
             # start with score 0
+            if document_id=='META-DATA':
+                continue
             if len(info_list)<2:
                 continue
             doc_score = 0
@@ -81,9 +83,10 @@ class Ranker:
     @staticmethod
     def create_c_of_doc(top_relevant_docs, parse_qurey,posting):
         # load map reduce from file
-        # relavent doc : # {doc_id : [score,doc_tuple, {index}]}
+        # relavent doc : # {num : [score,doc_tuple, {index}]}
         # c[term,term2] = sum[k](term1 in doc k * term2 in doc k)
         #  = > {}
+        map_reduce = MapReduce.import_map_reduce('MapReduceData/')
         c_matrix = {} # {term: {'other term' : value}}
         #set = {}
         for index in range(len(parse_qurey)):
@@ -96,10 +99,12 @@ class Ranker:
                 c_matrix[term] = {}
             # run on all dox in map reduce
             term_sim_dic = {} #{other_term: value - > sum until now}
-            for doc_id in top_relevant_docs.keys():
-                if doc_id !='META-DATA':
-                    if index in top_relevant_docs[doc_id][2]:
-                        document_dictionary = MapReduce.read_from(('Document',doc_id))
+            #run in all top n doc with term
+            for doc_id in posting[term]:
+                #if doc_id !='META-DATA':
+                    #if index in top_relevant_docs[doc_id][2]:
+                        #document_dictionary = MapReduce.read_from(('Document',doc_id))
+                        document_dictionary = map_reduce.read_from(str(doc_id)) #[()()()()()()()()()()]
                         #sum = 0
                         for doc_term, freq in document_dictionary.items():
                             #
