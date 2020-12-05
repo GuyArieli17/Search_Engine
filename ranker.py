@@ -63,9 +63,9 @@ class Ranker:
                 continue
             doc_score = 0
             # get all doc information
-            doc_tuple = info_list[0]
+            freq = info_list[0]
             # get from doc_tuple the number of time term appear
-            number_of_term_in_document = doc_tuple[1]
+            number_of_term_in_document = freq
             # get how many time appear from the doc_tuple
             intersection_terms = info_list[1]
             # run on all similar terms
@@ -81,46 +81,34 @@ class Ranker:
         return dict(sorted(relevant_doc.items(), key=lambda item: item[0], reverse=True)[:number_of_doc+1])
     
     @staticmethod
-    def create_c_of_doc(top_relevant_docs, parse_qurey,posting):
+    def create_c_of_doc(top_relevant_docs, dictFromQuery,posting):
         # load map reduce from file
         # relavent doc : # {num : [score,doc_tuple, {index}]}
         # c[term,term2] = sum[k](term1 in doc k * term2 in doc k)
         #  = > {}
+        queryAsList=[*dictFromQuery]
         map_reduce = MapReduce.import_map_reduce('MapReduceData/')
         c_matrix = {} # {term: {'other term' : value}}
-        #set = {}
-        for index in range(len(parse_qurey)):
-            term = parse_qurey[index]
-            # check if already exist
-            #if term not in c_matrix.keys():
-            #    c_matrix[term] = {}
-            # build {term: {}}
-            if term not in c_matrix.keys():
-                c_matrix[term] = {}
-            # run on all dox in map reduce
-            term_sim_dic = {} #{other_term: value - > sum until now}
-            #run in all top n doc with term
-            for doc_id in posting[term]:
-                #if doc_id !='META-DATA':
-                    #if index in top_relevant_docs[doc_id][2]:
-                        #document_dictionary = MapReduce.read_from(('Document',doc_id))
-                        document_dictionary = map_reduce.read_from(str(doc_id)) #[()()()()()()()()()()]
-                        #sum = 0
-                        for doc_term, freq in document_dictionary.items():
-                            #
-                            # if term == doc_term:
-                            #     continue
-                            # create new key
-                            if doc_term not in term_sim_dic.keys():
-                                term_sim_dic[doc_term] = 0
-                            term_sim_dic[doc_term] += freq * document_dictionary[term]
-            c_matrix[term] = term_sim_dic
+        for doc_id in top_relevant_docs.keys():
+            if doc_id != 'META-DATA':
+                doc_term_freq_dict = map_reduce.read_from_func_async(('Document', doc_id))[0]
+                for queryIndex in top_relevant_docs[doc_id][2]:
+                    termQuery=queryAsList[queryIndex]
+                    termFreq=doc_term_freq_dict[termQuery]
+                    if termQuery not in c_matrix.keys():
+                        c_matrix[termQuery]={}
+                    for term_doc,term_doc_freq in doc_term_freq_dict.items():
+                        if term_doc==termQuery:
+                            continue
+                        else:
+                            c_matrix[termQuery][term_doc]=termFreq*term_doc_freq
         return c_matrix
+
 
     @staticmethod
     def create_association_matrix(c_matrix):
 
-        # c_matrix will be a dic of dic  {term: {'other term' : value}}
+        # c_matrix will be a dic of dic  {term: totalSum}
         association_matrix = {}
         # dict build as first serch of i and then cearch j (dict inside a dict)
         for term in c_matrix.keys():
@@ -131,8 +119,13 @@ class Ranker:
             association_matrix[term] = column_dict
             # run on the values and keys
             for term_key, value in association_terms_dict.items():
-                column_dict[term_key] = (
-                    value) / (c_matrix[term][term] + c_matrix[term_key][term_key] - value)
+                c_term_key=0
+                if term_key in c_matrix.keys():
+                    c_term_key=c_matrix[term_key][term_key]
+                if (c_matrix[term][term] + c_term_key - value)==0:
+                    column_dict[term_key]=0
+                else:
+                    column_dict[term_key] = (value) / (c_matrix[term][term] + c_term_key - value)
         return association_matrix
 
     @staticmethod
@@ -151,12 +144,14 @@ class Ranker:
             # save this list
             insert_dic_by_term[term] = term_associated_term
             # take the top association word with term
-            for column in association_matrix[term]:
-                for inner_term, associated_value in column.items():
-                    #  column.item = { term : associated value}
-                    if associated_value >= MIN_REQUIREDMENT:
-                        term_associated_term.append(inner_term)
-                # may be add a sort so added word will be sorted
+            if term not in association_matrix.keys():
+                continue
+            column=association_matrix[term]
+            for inner_term, associated_value in column.items():
+                #  column.item = { term : associated value}
+                if associated_value >= MIN_REQUIREDMENT:
+                    term_associated_term.append(inner_term)
+            # may be add a sort so added word will be sorted
         # how much the indexies changed
         prev_added = 1
         # run and add all the new words
@@ -165,8 +160,9 @@ class Ranker:
         #    for value in list_values:
         #       parse_qurey.insert(index + prev_added, value)
         #        prev_added += 1
-        for term,added_word in insert_dic_by_term.items():
-            DictFromQuery[added_word]=DictFromQuery[term]
+        for term,list_added_word in insert_dic_by_term.items():
+            for inner_word in list_added_word:
+                DictFromQuery[inner_word]=DictFromQuery[term]
         insert_dic_by_term.clear()
 
     @staticmethod
@@ -180,7 +176,7 @@ class Ranker:
         # get the best n docs for qurey (simple)
         top_relvant_docs = Ranker.simple_rank_doc_top_n(relevant_doc,num_docs_to_retrieve,dictFromQuery)
         #create c basic matrix to work with
-        c_matrix = Ranker.create_c_of_doc(top_relvant_docs,[*dictFromQuery],posting)
+        c_matrix = Ranker.create_c_of_doc(top_relvant_docs,dictFromQuery,posting)
         association_matrix = Ranker.create_association_matrix(c_matrix)
         c_matrix.clear()
         Ranker.expand_qurey(dictFromQuery,association_matrix)
@@ -197,3 +193,34 @@ class Ranker:
         if len(sorted_relevant_doc)==0:
             return sorted_relevant_doc
         return sorted_relevant_doc[:k]
+
+
+
+"""
+#term = parse_qurey[index]
+            # check if already exist
+            #if term not in c_matrix.keys():
+            #    c_matrix[term] = {}
+            # build {term: {}}
+            if term not in c_matrix.keys():
+                c_matrix[term] = {}
+            # run on all dox in map reduce
+            term_sim_dic = {} #{other_term: value - > sum until now}
+            #run in all top n doc with term
+            for doc_id in top_relevant_docs.keys():
+                if doc_id !='META-DATA':
+                    #if index in top_relevant_docs[doc_id][2]:
+                        document_dictionary = map_reduce.read_from(('Document',doc_id))
+                        #document_dictionary = map_reduce.read_from(str(doc_id)) #[()()()()()()()()()()]
+                        #sum = 0
+                        for doc_term, freq in top_relevant_docs.items():
+                            #
+                            # if term == doc_term:
+                            #     continue
+                            # create new key
+                            if doc_term not in term_sim_dic.keys():
+                                term_sim_dic[doc_term] = 0
+                            term_sim_dic[doc_term] += freq * document_dictionary[term]
+            c_matrix[term] = term_sim_dic
+        return c_matrix
+"""
