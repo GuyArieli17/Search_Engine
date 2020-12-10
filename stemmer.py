@@ -40,3 +40,5 @@ if __name__ == '__main__':
         y = [word[i:i + n] for i in range(0, len(word), 1)]
         return y[:len(y) - 1]
     """
+
+    
