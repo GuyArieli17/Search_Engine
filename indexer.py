@@ -22,7 +22,7 @@ class Indexer:
         # self.map_reduce = MapReduce(self.avg_length,self.thread_pool_size)
         self.map_reduce_ag = MapReduce(self.avg_length, self.thread_pool_size, path + 'AG/')
         self.map_reduce_hq = MapReduce(self.avg_length, self.thread_pool_size, path + 'HQ/')
-        self.map_reduce_rz = MapReduce(self.avg_length, self.thread_pool_size, path + 'Rz/')
+        self.map_reduce_rz = MapReduce(self.avg_length, self.thread_pool_size, path + 'RZ/')
         self.map_reduce_other = MapReduce(self.avg_length, self.thread_pool_size, path + 'Others/')
         self.map_reduce_doc = MapReduce(self.avg_length, self.thread_pool_size, path + 'Document/')
         #self.tmp_pos = {}
@@ -40,7 +40,7 @@ class Indexer:
         self.tmp_pos_doc = {}
         # self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=5)
         self.NUMBER_OF_PROCESSES = 5
-        self.set_is_writting = {}
+        self.set_is_writting = set()
 
     def get_right_tmp_pos_and_num(self, first_letter):
         lower_letter = str(first_letter).lower()
@@ -49,7 +49,7 @@ class Indexer:
         elif 'h' <= lower_letter <= 'q':
             return [self.tmp_pos_hq, self.num_in_pos_hq_tmp, self.map_reduce_hq, 'HQ']
         elif 'r' <= lower_letter <= 'z':
-            return [self.tmp_pos_rz, self.num_in_pos_rz_tmp, self.map_reduce_rz, 'Rz']
+            return [self.tmp_pos_rz, self.num_in_pos_rz_tmp, self.map_reduce_rz, 'RZ']
         return [self.tmp_pos_other, self.num_in_pos_other_tmp, self.map_reduce_other, 'Others']
 
 
