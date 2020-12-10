@@ -268,9 +268,3 @@ class Parse:
         if word != '':
             self.add_term_to_dict(word, term_dict)
 
-
-if __name__ == '__main__':
-    p = Parse()
-    x = p.tokenSplit(
-        '5K', {})
-    print(p.terms_dic_to_document)
