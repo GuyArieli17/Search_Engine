@@ -4,25 +4,29 @@ import zlib
 import os
 import concurrent.futures
 from multiprocessing import Lock
-from asyncio import Semaphore
-import asyncio
 import utils
 
-
 class MapReduce:
-    def __init__(self, MAX_LINE_IN_FILE = 5000,thread_pool_size = 10,path = 'MapReduceData/', meta_data = {},prev_byte = 0,file_index = 0):
-        self.meta_data = meta_data #{term: [(self.file_index, self.line_number, number_of_lines)]]
+    def __init__(self, MAX_LINE_IN_FILE = 5000,thread_pool_size = 2,path = 'MapReduceData/', meta_data = {},prev_byte = 0,file_index = 0):
+        self.meta_data = {}
+        if len(meta_data) > 0:
+            self.meta_data = meta_data#{term: [(self.file_index, self.line_number, number_of_lines)]]
         self.prev_byte = prev_byte
         self.file_index = file_index
         self.thread_pool_size = thread_pool_size
         self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=thread_pool_size)
         self.MAX_IN_FILE = MAX_LINE_IN_FILE
-        self.process_semaphore = Semaphore(thread_pool_size)
         self.update_lock = Lock()
         self.path = path
         self.meta_data_save = self.path + 'MetaData'
+        self.number_of_current_thread = 0
+        self.number_of_current_thread_lock = Lock()
 
-    def update_meta_data(self,term,number_of_bytes):
+    def wait_untill_finish(self):
+        while self.number_of_current_thread >= 0:
+            pass
+
+    def update_meta_data(self, term, number_of_bytes):
         #  if seen first time create a empty one
         if term not in self.meta_data.keys():
             self.meta_data[term] = []
@@ -34,41 +38,38 @@ class MapReduce:
             self.prev_byte = 0
             self.file_index += 1
 
-    def write_dict(self,dic):
-        self.executor.submit(self.write_dict_func,dic) #[self,dic]
+    def write_dict(self, dic):
+        # self.write_dict_func(dic)
+        self.number_of_current_thread_lock.acquire()
+        self.number_of_current_thread += 1
+        self.number_of_current_thread_lock.release()
+        self.executor.submit(self.write_dict_func(dic))
 
-    def write_dict_func(self,dic):
-        asyncio.run(self.write_dict_func_async(dic))
-
-    async def write_dict_func_async(self,dic):
-        await self.process_semaphore.acquire()
+    def write_dict_func(self, dic_org):
+        dic = dic_org.copy()
+        dic_org.clear()
         try:
-            # print('Process_' + str(self.process_counter) + ': start writing')
-            # key = term
-            # value = [(doc1,freq_doc1)]
             for key, value in dic.items():
                 self.write_in(key, value)
-            #  check if need to create a new file afterward
         finally:
-            self.process_semaphore.release()
+            self.number_of_current_thread_lock.acquire()
+            self.number_of_current_thread -= 1
+            self.number_of_current_thread_lock.release()
+            dic.clear()
             return True
 
-    def write_in(self,term, data_list):
+    def write_in(self, term, data_list):
+        self.update_lock.acquire()
         #  file name = (dic location) / the possible file to write in
-        if isinstance(term,list):
-            print("x")
         file_name = self.path + str(self.file_index)
         # only one process can update
-        self.update_lock.acquire()
         # add data_list to file_name
         number_of_bytes = self.append_line([data_list], file_name)
         # save as (file_index,line_number_start,length)
-        self.update_meta_data(term,number_of_bytes)
+        self.update_meta_data(term, number_of_bytes)
         # update number of line after add of data_list
         self.update_files()
-
         self.update_lock.release()
-
 
     def append_line(self, data_list, file_name):
         """
@@ -79,31 +80,15 @@ class MapReduce:
         number_of_bytes = 0
         with open(file_name + '.comp', "ab") as fd:
             if isinstance(data_list,list):
-                # bytes = io.BytesIO()
-                # # convert data into bytes as Bytes
-                # pickle.dump(data_list, bytes)
-                # # compress the byte and insert into zbytes
-                # zbytes = zlib.compress(bytes.getbuffer())
-                # # zbytes = bytes.getbuffer()
-                # number_of_bytes = len(zbytes)
-                # # number_of_bytes += len(str(data_list))
-                # # fd.write(str(data_list))
-                # fd.write(zbytes)
-
                 for data_tuple in data_list:
                     # pickle.dump(data_tuple, fd, pickle.HIGHEST_PROTOCOL)
                     bytes = io.BytesIO()
                     # convert data into bytes as Bytes
                     pickle.dump(data_tuple, bytes)
-                    # compress the byte and insert into zbytes
                     # zbytes = zlib.compress(bytes.getbuffer())
                     zbytes = bytes.getbuffer()
                     number_of_bytes += len(zbytes)
-                    # number_of_bytes += len(str(data_tuple))
-                    # fd.write(str(data_tuple))
                     fd.write(zbytes)
-
-
             # how to add dic
             elif isinstance(data_list,dict):
                 bytes = io.BytesIO()
@@ -153,9 +138,8 @@ class MapReduce:
                 if isinstance(organize_dic[(current_file_index, current_line_number)],dict):
                     data_list += (organize_dic[(current_file_index, current_line_number)],0)
                 else:
-                    data_list+=organize_dic[(current_file_index, current_line_number)]
+                    data_list += organize_dic[(current_file_index, current_line_number)]
         finally:
-            #self.process_semaphore.release()
             return data_list
 
     def read_line(self, file_name,file_byte_lst):
@@ -234,7 +218,7 @@ class MapReduce:
 
     def save_map_reduce(self):
         list = [self.MAX_IN_FILE, self.thread_pool_size, self.path, self.meta_data, self.prev_byte, self.file_index]
-        utils.save_obj(list,self.meta_data_save)
+        utils.save_obj(list, self.meta_data_save)
 
     @staticmethod
     def import_map_reduce(path):
