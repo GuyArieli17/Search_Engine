@@ -13,3 +13,5 @@ class ConfigClass:
 
     def get_stemmig(self):
         return self.toStem
+
+    
