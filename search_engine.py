@@ -5,9 +5,11 @@ from parser_module import Parse
 from indexer import Indexer
 from searcher import Searcher
 import utils
-import xlwt
 from xlwt import Workbook
 from MapReduce import MapReduce
+
+
+
 
 
 def run_engine(corpus_path, output_path, stemming, queries, num_docs_to_retrieve):
@@ -20,12 +22,10 @@ def run_engine(corpus_path, output_path, stemming, queries, num_docs_to_retrieve
     r = ReadFile(corpus_path=config.get__corpusPath())
     p = Parse(stemming)
     indexer = Indexer(config, p.terms_dic_to_document)
-
-    #  documents_list = r.read_file(file_name='sample3.parquet')
     # Iterate over every document in the file
     for i in r.filesPath:
-        documents_list = r.read_file(i)
         start_time = time.time()
+        documents_list = r.read_file(i)
         for idx, document in enumerate(documents_list):
             # parse the document
             parsed_document = p.parse_doc(document)
@@ -34,17 +34,15 @@ def run_engine(corpus_path, output_path, stemming, queries, num_docs_to_retrieve
             # index the document data
             indexer.add_new_doc(parsed_document)
         print(time.time() - start_time)
-    print('Finished parsing and indexing. Starting to export files')
-
+    #print('--------------------------')
+    indexer.save_all_left_overs()
+    print('Total Size: ' + str(indexer.get_total_size()))
+    #print('Finished writing to disk left overs')
+    #print('--------------------------')
+    #print('Finished parsing and indexing. Starting to export files')
     utils.save_obj(indexer.inverted_idx, "inverted_idx")
-    #utils.save_obj(indexer.map_reduce, "posting")
-    if len(indexer.tmp_pos)>0:
-        for k,v in indexer.tmp_pos.items():
-            indexer.map_reduce.write_in(k,v)
-        #indexer.map_reduce.write_dict_func_async(indexer.tmp_pos)
-        indexer.tmp_pos.clear()
-        indexer.num_in_pos_tmp=0
-    indexer.map_reduce.save_map_reduce()
+    indexer.save_all_map_reduce()
+    # indexer.map_reduce.save_map_reduce()
 
 def load_index():
     print('Load inverted index')
@@ -58,12 +56,40 @@ def search_and_rank_query(query, inverted_index,num_docs_to_retrieve):
     query_as_list = [*dictFromQuery]
     searcher = Searcher(inverted_index)
     #posting = utils.load_obj("posting")
-    map_reduce=MapReduce.import_map_reduce('MapReduceData/')
-    posting={}
+    #print('-------------------------------------')
+    #print('Start import mapReduce')
+    # map_reduce = MapReduce.import_map_reduce('MapReduceData/')
+    map_reduce_ag = MapReduce.import_map_reduce('MapReduceData/AG/')
+    map_reduce_hq = MapReduce.import_map_reduce('MapReduceData/HQ/')
+    map_reduce_rz = MapReduce.import_map_reduce('MapReduceData/RZ/')
+    map_reduce_other = MapReduce.import_map_reduce('MapReduceData/Others/')
+    #map_reduce_doc = MapReduce.import_map_reduce('MapReduceData/Document/')
+    #print('Done importing mapReduce')
+    posting = {}
+    #print('-------------------------------------')
+    #print('Start build posting file')
+    query_as_list.sort(key=lambda x: x.lower())
     for term in query_as_list:
-        posting[term]=map_reduce.read_from_func_async(term)
+        lower_letter = term[0].lower()
+        current_map = map_reduce_other
+        if 'a' <= lower_letter <= 'g':
+            current_map = map_reduce_ag
+        elif 'h' <= lower_letter <= 'q':
+            current_map = map_reduce_hq
+        elif 'r' <= lower_letter <= 'z':
+            current_map = map_reduce_rz
+        if term[0].isupper() and " " in term:
+            current_map = map_reduce_other
+        posting[term] = current_map.read_from(term.lower())
+    #print('Done building posting file')
+    #print('-------------------------------------')
+    #print('Get relevant Doc')
     relevant_docs = searcher.relevant_docs_from_posting(query_as_list,posting)
+    #print('Done getting relevant Doc')
+    #print('-------------------------------------')
+    #print('Start ranking docs')
     ranked_docs = searcher.ranker.rank_relevant_doc(relevant_docs,dictFromQuery,posting,num_docs_to_retrieve)
+    #print('Done ranking docs')
     return searcher.ranker.retrieve_top_k(ranked_docs,num_docs_to_retrieve)
 
 def main(corpus_path, output_path, stemming, queries, num_docs_to_retrieve):
@@ -80,8 +106,8 @@ def main(corpus_path, output_path, stemming, queries, num_docs_to_retrieve):
     # k = int(input("Please enter number of docs to retrieve: "))
     inverted_index = load_index()
     for query in queries:
+        start_time = time.time()
         d=search_and_rank_query(query, inverted_index, num_docs_to_retrieve)
-        print(d)
         for doc_tuple in d:
             if doc_tuple[0]!='META-DATA':
                 sheet1.write(counter,0,counter)
@@ -90,6 +116,7 @@ def main(corpus_path, output_path, stemming, queries, num_docs_to_retrieve):
                 sheet1.write(counter,3,doc_tuple[1][0])
                 counter+=1
         counterQuery+=1
-    wb.save('results.xls')
+        print('Time:' + str(time.time() - start_time))
+    wb.save(output_path + 'results.xls')
 
 # print('tweet id: {}, score (unique common words with query): {}'.format(doc_tuple[0], doc_tuple[1]))
