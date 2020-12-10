@@ -4,8 +4,10 @@ from MapReduce import MapReduce
 class Ranker:
 
     def __init__(self):
-        #lalal
-        pass
+        self.map_reduce_ag = MapReduce.import_map_reduce('MapReduceData/AG/')
+        self.map_reduce_hq = MapReduce.import_map_reduce('MapReduceData/HQ/')
+        self.map_reduce_rz = MapReduce.import_map_reduce('MapReduceData/RZ/')
+        self.map_reduce_other = MapReduce.import_map_reduce('MapReduceData/Others/')
 
     @staticmethod
     def get_relvant_docs(parse_query, posting):
@@ -42,7 +44,7 @@ class Ranker:
         document_punishment = 1.0
         # document_punishment = 1 - self._b + self._b * \
         #     (number_of_term_in_document/avg_doc_length)
-        num=float(number_of_term_in_document)
+        num = float(number_of_term_in_document)
         divider = term_frequence*(num * (_k + 1.0))/(num + _k * document_punishment)
         return idf_term * divider
 
@@ -80,8 +82,6 @@ class Ranker:
                                                    number_of_document_with_term, number_of_term_in_document)
             info_list.insert(0, doc_score) # [score,doc_tuple, {index}]
         # sort by the score
-        #if number_of_doc == 'All': {'metadat:[],'docid:[rank,()]'}
-           # return sorted(relevant_doc.items(), key=lambda item: item[1][0], reverse=True)
         lst = relevant_doc.pop('META-DATA')
         result=sorted(relevant_doc.items(), key=lambda item: item[1][0], reverse=True)[:number_of_doc]
         result+=[('META-DATA',lst)]
@@ -89,26 +89,33 @@ class Ranker:
         return result
     
     @staticmethod
-    def create_c_of_doc(top_relevant_docs, dictFromQuery,posting):
+    def create_c_of_doc(top_relevant_docs, dictFromQuery,posting={}):
         # load map reduce from file
         # relavent doc : # {num : [score,doc_tuple, {index}]}
         # c[term,term2] = sum[k](term1 in doc k * term2 in doc k)
         #  = > {}
-        queryAsList=[*dictFromQuery]
-        map_reduce = MapReduce.import_map_reduce('MapReduceData/')
+        #queryAsList=[*dictFromQuery]
+        map_reduce = MapReduce.import_map_reduce('MapReduceData/Document/')
         c_matrix = {} # {term: {'other term' : value}}
         for doc_id in top_relevant_docs.keys():
             if doc_id != 'META-DATA':
-                doc_term_freq_dict = map_reduce.read_from_func_async(('Document', doc_id))
+                info_list = map_reduce.read_from(('Document', doc_id))
+                doc_term_freq_dict = info_list
+                # max_freq = info_list[1]
                 if len(doc_term_freq_dict)==0:
                     continue
-                doc_term_freq_dict=doc_term_freq_dict[0]
-                for term_doc1,term_doc_freq1 in doc_term_freq_dict.items():
+                dict_list = [*doc_term_freq_dict]
+                dict_list.sort()
+                for index_i in range(len(dict_list)):
+                    term_doc1 = dict_list[index_i]
+                    term_doc_freq1 = doc_term_freq_dict[term_doc1]
                 #for queryIndex in top_relevant_docs[doc_id][2]:
                     if term_doc1 not in c_matrix.keys():
                         c_matrix[term_doc1]={}
-                    for term_doc2,term_doc_freq2 in doc_term_freq_dict.items():
-                        if term_doc1 in dictFromQuery.keys() or term_doc1==term_doc2:
+                    for index_j in range(len(dict_list)):
+                        term_doc2 = dict_list[index_j]
+                        term_doc_freq2 = doc_term_freq_dict[term_doc2]
+                        if term_doc1 in dictFromQuery.keys() or term_doc1 == term_doc2:
                             if term_doc2 not in c_matrix[term_doc1]:
                                 c_matrix[term_doc1][term_doc2] = 0
                             c_matrix[term_doc1][term_doc2] += term_doc_freq1 * term_doc_freq2 #Cii,Cjj,Cij
@@ -134,14 +141,14 @@ class Ranker:
                 c_term_key=0
                 if term_key in c_matrix.keys():
                     c_term_key=c_matrix[term_key][term_key]
-                if (c_matrix[term][term] + c_term_key - value)==0:
-                    column_dict[term_key]=0
+                if (c_matrix[term][term] + c_term_key - value) == 0:
+                    column_dict[term_key] = 0
                 else:
-                    column_dict[term_key] = (value) / (c_matrix[term][term] + c_term_key - value)
+                    column_dict[term_key] = value / (c_matrix[term][term] + c_term_key - value)
         return association_matrix
 
     @staticmethod
-    def expand_qurey(DictFromQuery, association_matrix):
+    def expand_qurey(DictFromQuery, association_matrix,posting={}):
         # from wich associatio we accept
         MIN_REQUIREDMENT = 0.6
         # the word we will insert
@@ -164,10 +171,21 @@ class Ranker:
                 if associated_value >= MIN_REQUIREDMENT and inner_term != term:
                     term_associated_term.append(inner_term)
             # may be add a sort so added word will be sorted
-        for term,list_added_word in insert_dic_by_term.items():
+        for term, list_added_word in insert_dic_by_term.items():
             for inner_word in list_added_word:
-                DictFromQuery[inner_word]=DictFromQuery[term]
+                DictFromQuery[inner_word] = DictFromQuery[term]
+                posting[inner_word] = Ranker.findTheMapReduce(inner_word)
         insert_dic_by_term.clear()
+
+    def findTheMapReduce(self,term):
+        if 'a' <= term[0].lower() <= 'g':
+            return self.map_reduce_ag.read_from(term)
+        elif 'h' <= term[0].lower() <= 'q':
+            return self.map_reduce_hq.read_from(term)
+        elif 'r' <= term[0].lower() <= 'z':
+            return self.map_reduce_rz.read_from(term)
+        else:
+            return self.map_reduce_other.read_from(term)
 
     @staticmethod
     def rank_relevant_doc(relevant_doc,dictFromQuery,posting,num_docs_to_retrieve=100):
@@ -183,7 +201,7 @@ class Ranker:
         c_matrix = Ranker.create_c_of_doc(dict(top_relvant_docs),dictFromQuery,posting)
         association_matrix = Ranker.create_association_matrix(c_matrix,dictFromQuery)
         c_matrix.clear()
-        Ranker.expand_qurey(dictFromQuery,association_matrix)
+        Ranker.expand_qurey(dictFromQuery,association_matrix,posting)
         return Ranker.simple_rank_doc_top_n(Ranker.get_relvant_docs([*dictFromQuery],posting),num_docs_to_retrieve,dictFromQuery)
 
     @staticmethod
