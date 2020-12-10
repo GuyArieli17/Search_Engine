@@ -38,3 +38,5 @@ class ReadFile:
             for i in self.filesPath:
                 self.dictDocuments[i]=self.read_file(i)
     """
+
+    
